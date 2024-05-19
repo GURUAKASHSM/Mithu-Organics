@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <img id="guru">
+    <script>
+        let upi = {
+            pa: "9942047885sm@okicici",
+            pn: "Foody",
+            tn: "Order",
+            am: "10.00",
+            cu: "INR"
+        };
+
+        // Convert the UPI object to a URLSearchParams string
+        let upiLink = new URLSearchParams(upi).toString();
+
+        // Construct the UPI link
+        let upiUri = `upi://pay?${upiLink}`;
+
+        // Generate the QR code
+        let qrCodeContainer = document.createElement('div');
+        new QRCode(qrCodeContainer, {
+            text: upiUri,
+            width: 128,
+            height: 128
+        });
+
+        // Replace the img element with the generated QR code
+        document.getElementById('guru').replaceWith(qrCodeContainer);
+    </script>
+</body>
+</html>

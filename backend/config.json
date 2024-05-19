@@ -1,0 +1,27 @@
+{
+    "mongoConfig": {
+        "mongourl": "mongodb+srv://guru:guru@banking.sy1piq8.mongodb.net/?retryWrites=true&w=majority",
+        "host": "0.0.0.0",
+        "port": 8080,
+        "database": "MithuOrganics",
+
+
+        "username": "mithuorganics@gmail.com",
+        "password": "mithuorganics",
+        "ip":"12.12.0.1",
+        "secretkey":"1221211212",
+  
+        "admintokenkey":"guruakash",
+        "usertokenkey":"guruakash",
+
+       
+        "email":"mithuorganics@gmail.com",
+        "appcode":"123456",
+        "emailusername":"123456",
+
+        "adminpasswordkey":"trqh!@#$%$qwxkqe13423knsf",
+        "userpasswordkey":"trqhqwxkqe13423k!@#$%^&nsf"
+
+
+    }
+}
