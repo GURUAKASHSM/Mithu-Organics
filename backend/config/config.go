@@ -30,6 +30,7 @@ var(
  FeedBack_Collection *mongo.Collection
  UserAudit_Collection *mongo.Collection
  AdminAudit_Collection *mongo.Collection
+ DeveloperAudit_Collection *mongo.Collection
 
 )
 
@@ -64,6 +65,6 @@ func init() {
 	FeedBack_Collection = client.Database(constants.DataBaseName).Collection(constants.FeedBack_Collection)
 	UserAudit_Collection = client.Database(constants.DataBaseName).Collection(constants.UserAudit_Collection)
 	AdminAudit_Collection = client.Database(constants.DataBaseName).Collection(constants.AdminAudit_Collection)
-
+	DeveloperAudit_Collection = client.Database(constants.DataBaseName).Collection(constants.DeveloperAudit_Collection)
 	fmt.Println("****** Collections Created ******")
 }

@@ -7,24 +7,25 @@ import (
 )
 
 type MongoConfig struct {
-	URL           string `mapstructure:"mongourl"`
-	Host          string `mapstructure:"host"`
-	Port          int    `mapstructure:"port"`
-	Database      string `mapstructure:"database"`
+	URL      string `mapstructure:"mongourl"`
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	Database string `mapstructure:"database"`
 
-	Email                string `mapstructure:"email"`
-	Appcode              string `mapstructure:"appcode"`
-	EmailUserName        string `mapstructure:"emailusername"`
+	Email         string `mapstructure:"email"`
+	Appcode       string `mapstructure:"appcode"`
+	EmailUserName string `mapstructure:"emailusername"`
 
-	Username             string `mapstructure:"username"`
-	Password             string `mapstructure:"password"`
-	IP                   string `mapstructure:"ip"`
+	AdminEmail string `mapstructure:"adminemail"`
+	AdminName  string `mapstructure:"adminname"`
+	Password   string `mapstructure:"password"`
+	IP         string `mapstructure:"ip"`
 
-	AdminPasswordHashKey []byte `mapstructure:"adminpasswordkey"`
-	UserPasswordHashKey  []byte `mapstructure:"userpasswordkey"`
+	AdminPasswordHashKey string `mapstructure:"adminpasswordkey"`
+	UserPasswordHashKey  string `mapstructure:"userpasswordkey"`
 
-	AdminTokenKey []byte `mapstructure:"admintokenkey"`
-	UserTokenKey  []byte `mapstructure:"usertokenkey"`
+	AdminTokenKey string `mapstructure:"admintokenkey"`
+	UserTokenKey  string `mapstructure:"usertokenkey"`
 }
 
 var mongoConfig MongoConfig
@@ -40,6 +41,11 @@ var (
 	UserPasswordHashKey  []byte
 	AdminTokenKey        []byte
 	UserTokenKey         []byte
+
+	AdminEmail string
+	AdminName  string
+	Password   string
+	IP         string
 )
 
 func init() {
@@ -63,16 +69,21 @@ func init() {
 	Port = mongoConfig.Port
 	Host = mongoConfig.Host
 
-	AdminTokenKey = mongoConfig.AdminTokenKey
-	UserTokenKey = mongoConfig.UserTokenKey
+	// Convert string keys to byte slices
+	AdminTokenKey = []byte(mongoConfig.AdminTokenKey)
+	UserTokenKey = []byte(mongoConfig.UserTokenKey)
 
 	Email = mongoConfig.Email
 	Appcode = mongoConfig.Appcode
 	EmailUserName = mongoConfig.EmailUserName
 
-	AdminPasswordHashKey = mongoConfig.AdminPasswordHashKey
-	UserPasswordHashKey = mongoConfig.UserPasswordHashKey
+	AdminPasswordHashKey = []byte(mongoConfig.AdminPasswordHashKey)
+	UserPasswordHashKey = []byte(mongoConfig.UserPasswordHashKey)
 
+	AdminEmail = mongoConfig.AdminEmail
+	AdminName = mongoConfig.AdminName
+	Password = mongoConfig.Password
+	IP = mongoConfig.IP
 	log.Println("** --------------------- **")
 }
 
@@ -93,7 +104,7 @@ const (
 	ContactPage_Collection       = "CONTACTPAGE"
 	SiteData_Collection          = "SITEDATA"
 	FeedBack_Collection          = "FEEDBACK"
-	AdminAudit_Collection          = "ADMINAUDIT"
-	UserAudit_Collection          = "USERAUDIT"
-
+	AdminAudit_Collection        = "ADMINAUDIT"
+	UserAudit_Collection         = "USERAUDIT"
+	DeveloperAudit_Collection    = "DEVELOPERAUDIT"
 )

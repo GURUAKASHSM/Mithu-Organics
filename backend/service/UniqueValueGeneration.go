@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-	"golang.org/x/crypto/bcrypt"
+	//"golang.org/x/crypto/bcrypt"
 )
 
 
@@ -22,6 +22,10 @@ func GenerateUniqueOrderID() string {
 }
 
 func GenerateUniqueProductID() string {
+	return fmt.Sprintf("%d%s", time.Now().UnixNano(), GetRandomString(12))
+}
+
+func GenerateUniqueAuditID() string {
 	return fmt.Sprintf("%d%s", time.Now().UnixNano(), GetRandomString(12))
 }
 

@@ -5,14 +5,14 @@
         "port": 8080,
         "database": "MithuOrganics",
 
-
-        "username": "mithuorganics@gmail.com",
+        "adminemail":"mithuorganics@gmail.com",
+        "adminname": "mithuorganics",
         "password": "mithuorganics",
-        "ip":"12.12.0.1",
-        "secretkey":"1221211212",
+        "ip":"152.58.220.206",
+        
   
-        "admintokenkey":"guruakash",
-        "usertokenkey":"guruakash",
+        "admintokenkey":"1234567890123456",
+        "usertokenkey":"1234567890123456",
 
        
         "email":"mithuorganics@gmail.com",

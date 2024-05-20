@@ -1,15 +1,16 @@
 package main
 
 import (
-    "mithuorganics/router"
-    "fmt"
-    "log"
-    "os"
+	"fmt"
+	"log"
+	"mithuorganics/router"
+	"mithuorganics/service"
+	"os"
 )
 
 func main() {
     fmt.Println("***** Requested to start Mithu Organics Server *****")
-    
+    service.DetailsToDB()
     r := router.Router()
 
     port := os.Getenv("PORT")

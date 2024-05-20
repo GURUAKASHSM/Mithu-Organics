@@ -1,6 +1,7 @@
 package service
 
 import (
+	"net"
 	"regexp"
 	"strconv"
 )
@@ -19,23 +20,40 @@ func countdigits(number int) int {
 	return int(count)
 }
 
-func Validatetoken(token, SecretKey string) bool {
-	_, err := ExtractCustomerID(token, SecretKey)
-	return err == nil
+// func Validatetoken(token, SecretKey string) bool {
+// 	_, err := ExtractCustomerID(token, SecretKey)
+// 	return err == nil
+// }
+
+func IsValidIP(ip string) bool {
+	return net.ParseIP(ip) != nil
 }
 
 func floatToString(inputFloat float64) string {
 	return strconv.FormatFloat(inputFloat, 'f', 2, 64)
 }
 
+func IsValidTOTP(totp string) bool {
+	const totpRegexPattern = `^\d{6}$`
+	totpRegex := regexp.MustCompile(totpRegexPattern)
+	return totpRegex.MatchString(totp)
+}
+
+
 func intToString(num int) string {
-    return strconv.Itoa(num)
+	return strconv.Itoa(num)
 }
 
 func stringToInt(str string) (int, error) {
-    num, err := strconv.Atoi(str)
-    if err != nil {
-        return 0, err
-    }
-    return num, nil
+	num, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, err
+	}
+	return num, nil
+}
+func IsValidEmail(email string) bool {
+	const emailRegexPattern = `^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`
+	emailRegex := regexp.MustCompile(emailRegexPattern)
+
+	return emailRegex.MatchString(email)
 }
