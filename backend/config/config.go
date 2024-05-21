@@ -2,42 +2,44 @@ package config
 
 import (
 	"context"
-	"mithuorganics/constants"
 	"fmt"
 	"log"
-
+	"mithuorganics/constants"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-
-var(
- Admin_Collection *mongo.Collection
- Customer_Collection *mongo.Collection
- Product_Collection *mongo.Collection
- Order_Collection *mongo.Collection
- Cart_Collection *mongo.Collection
- BestSelling_Collection *mongo.Collection
- Favorite_Collection *mongo.Collection
- Instagram_Collection *mongo.Collection
- Trending_Collection *mongo.Collection
- PopularCategories_Collection *mongo.Collection
- ShopPage_Collection *mongo.Collection
- AboutPage_Collection *mongo.Collection
- ContactPage_Collection *mongo.Collection
- SiteData_Collection *mongo.Collection
- FeedBack_Collection *mongo.Collection
- UserAudit_Collection *mongo.Collection
- AdminAudit_Collection *mongo.Collection
- DeveloperAudit_Collection *mongo.Collection
-
+var (
+	Admin_Collection             *mongo.Collection
+	Customer_Collection          *mongo.Collection
+	Product_Collection           *mongo.Collection
+	Order_Collection             *mongo.Collection
+	Cart_Collection              *mongo.Collection
+	BestSelling_Collection       *mongo.Collection
+	Favorite_Collection          *mongo.Collection
+	Instagram_Collection         *mongo.Collection
+	Trending_Collection          *mongo.Collection
+	PopularCategories_Collection *mongo.Collection
+	ShopPage_Collection          *mongo.Collection
+	AboutPage_Collection         *mongo.Collection
+	ContactPage_Collection       *mongo.Collection
+	SiteData_Collection          *mongo.Collection
+	FeedBack_Collection          *mongo.Collection
+	UserAudit_Collection         *mongo.Collection
+	AdminAudit_Collection        *mongo.Collection
+	DeveloperAudit_Collection    *mongo.Collection
+	AdminDeleted_Collection      *mongo.Collection
+	UserDeleted_Collection       *mongo.Collection
+	OrderDeleted_Collection      *mongo.Collection
+	AdminEdited_Collection       *mongo.Collection
+	UserEdited_Collection        *mongo.Collection
+	OrderEdited_Collection       *mongo.Collection
 )
-
 
 func init() {
 	log.Println("********** Connecting To DataBase **********")
-	
+
 	clientoption := options.Client().ApplyURI(constants.ConnectionString)
 
 	client, err := mongo.Connect(context.TODO(), clientoption)
@@ -66,5 +68,11 @@ func init() {
 	UserAudit_Collection = client.Database(constants.DataBaseName).Collection(constants.UserAudit_Collection)
 	AdminAudit_Collection = client.Database(constants.DataBaseName).Collection(constants.AdminAudit_Collection)
 	DeveloperAudit_Collection = client.Database(constants.DataBaseName).Collection(constants.DeveloperAudit_Collection)
+	AdminDeleted_Collection = client.Database(constants.DataBaseName).Collection(constants.AdminDeleted_Collection)
+	UserDeleted_Collection = client.Database(constants.DataBaseName).Collection(constants.UserDeleted_Collection)
+	OrderDeleted_Collection = client.Database(constants.DataBaseName).Collection(constants.OrderDeleted_Collection)
+	AdminEdited_Collection = client.Database(constants.DataBaseName).Collection(constants.AdminEdited_Collection)
+	UserEdited_Collection = client.Database(constants.DataBaseName).Collection(constants.UserEdited_Collection)
+	OrderEdited_Collection = client.Database(constants.DataBaseName).Collection(constants.OrderEdited_Collection)
 	fmt.Println("****** Collections Created ******")
 }

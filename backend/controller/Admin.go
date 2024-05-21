@@ -26,6 +26,67 @@ func AdminLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": result})
 }
 
+// Create Admin
+func CreateAdmin(c *gin.Context) {
+	var admin models.AdminSignup
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.CreateAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+//List Admin
+func ListAdmin(c *gin.Context){
+	var admin models.ListInput
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ListAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+//Delete Admin
+func DeleteAdmin(c *gin.Context){
+	var admin models.DeleteAdminRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.DeleteAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+//Delete Admin
+func EditAdmin(c *gin.Context){
+	var admin models.EditAdminRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.EditAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+
 // // Get all Inventory Data
 // func Getinventorydata(c *gin.Context) {
 // 	Inventorydata := service.Getinventorydata()
@@ -81,20 +142,7 @@ func AdminLogin(c *gin.Context) {
 // 	c.JSON(http.StatusOK, gin.H{"result": data})
 // }
 
-// // Create Admin
-// func CreateAdmin(c *gin.Context) {
-// 	var admin models.AdminSignup
-// 	if err := c.BindJSON(&admin); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
-// 		return
-// 	}
-// 	result, data := service.CreateAdmin(admin)
-// 	if result == "Created Successfully" {
-// 		c.JSON(http.StatusOK, gin.H{"result": data})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"error": result})
-// }
+
 
 // // Create Seller
 // func CreateSeller(c *gin.Context) {

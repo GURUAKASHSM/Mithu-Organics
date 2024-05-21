@@ -107,4 +107,10 @@ const (
 	AdminAudit_Collection        = "ADMINAUDIT"
 	UserAudit_Collection         = "USERAUDIT"
 	DeveloperAudit_Collection    = "DEVELOPERAUDIT"
+	AdminDeleted_Collection      = "DELETED_ADMIN"
+	UserDeleted_Collection       = "DELETED_USER"
+	OrderDeleted_Collection      = "DELETED_ORDER"
+	AdminEdited_Collection       = "EDITED_ADMIN"
+	UserEdited_Collection        = "EDITED_USER"
+	OrderEdited_Collection       = "EDITED_ORDER"
 )

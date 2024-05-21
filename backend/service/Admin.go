@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 	"mithuorganics/config"
 	"mithuorganics/constants"
 
@@ -275,7 +276,7 @@ func AdminLoginCheck(login models.AdminSignin) models.AdminLoginResponse {
 
 // Create Admin
 func CreateAdmin(admin models.AdminSignup) models.CreateAdminResponse {
-
+	log.Println(len(admin.FromAdminToken) < 20, len(admin.FromAdminPublicKey) < 30, len(admin.AdminName) <= 4, !IsValidEmail(admin.Email), !IsValidIP(admin.IP_Address), len(admin.Password) <= 5, len(admin.ConfirmPassword) <= 5, len(admin.Password) != len(admin.ConfirmPassword))
 	if len(admin.FromAdminToken) < 20 || len(admin.FromAdminPublicKey) < 30 || len(admin.AdminName) <= 4 || !IsValidEmail(admin.Email) || !IsValidIP(admin.IP_Address) || len(admin.Password) <= 5 || len(admin.ConfirmPassword) <= 5 || len(admin.Password) != len(admin.ConfirmPassword) {
 		var response models.CreateAdminResponse
 		response.StatusCode = "200"
@@ -303,13 +304,13 @@ func CreateAdmin(admin models.AdminSignup) models.CreateAdminResponse {
 		var response models.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
-		response.Message = "Error in Creating"
+		response.Message = "Login Expired"
 		response.CreatingTime = time.Now()
 
 		var audit models.AdminAudit
 		audit.APIName = "AddAdmin"
 		audit.AdminID = "NOT FOUND"
-		audit.Message = "ERROR WHILE PROCESSING"
+		audit.Message = "LOGIN EXPIRED"
 		admin.Password = ""
 		admin.ConfirmPassword = ""
 		audit.Payload = admin
@@ -318,12 +319,7 @@ func CreateAdmin(admin models.AdminSignup) models.CreateAdminResponse {
 		audit.StatusMessage = "FAILED"
 		audit.Response = response
 
-		var dev models.DeveloperAudit
-		dev.Audit = audit
-		dev.Message = "ERROR WHILE EXTRACTING ID FROM TOKEN"
-
 		go AdminAudit(audit)
-		go DeveloperAudit(dev)
 		return response
 
 	}
@@ -338,7 +334,7 @@ func CreateAdmin(admin models.AdminSignup) models.CreateAdminResponse {
 		"isblocked":     1,
 	}
 	options := options.FindOne().SetProjection(projection)
-	err = config.Admin_Collection.FindOne(context.Background(), filter,options).Decode(&fromAdmin)
+	err = config.Admin_Collection.FindOne(context.Background(), filter, options).Decode(&fromAdmin)
 	if err != nil {
 		var response models.CreateAdminResponse
 		response.StatusCode = "200"
@@ -595,6 +591,922 @@ func CreateAdmin(admin models.AdminSignup) models.CreateAdminResponse {
 		return response
 	}
 
+}
+
+func ListAdmin(input models.ListInput) models.ListAdminResponse {
+	if len(input.Token) < 20 || len(input.PublicKey) < 30 || (input.SearchBY == "" && input.SearchValue != "") || (input.SearchValue == "" && input.SearchBY != "") {
+		var response models.ListAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Wrong Input Data"
+		response.Listedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ListAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "INVALID INPUT"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+		return response
+	}
+	id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
+	if err != nil {
+		var response models.ListAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Login Expired"
+		response.Listedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ListAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "LOGIN EXPIRED"
+		audit.Error = err
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+
+		return response
+	}
+	var admin models.AdminData
+	filter := bson.M{"adminid": id}
+	projection := bson.M{
+		"_id":           0,
+		"adminid":       1,
+		"canalteradmin": 1,
+		"isblocked":     1,
+	}
+	option := options.FindOne().SetProjection(projection)
+	err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&admin)
+	if err != nil {
+		var response models.ListAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Error in Listing"
+		response.Listedtime = time.Now()
+		response.Error = err
+		var audit models.AdminAudit
+		audit.APIName = "ListAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "ERROR WHILE PROCESSING"
+		audit.Error = err
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ADMIN ID NOT FOUND IN DB BUT HAS TOKEN"
+
+		go AdminAudit(audit)
+		go DeveloperAudit(dev)
+		return response
+	}
+	if admin.IsBlocked {
+		var response models.ListAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Your ID has been Blocked"
+		response.Listedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ListAdmin"
+		audit.AdminID = admin.AdminID
+		audit.Message = "ADMIN ID HAS BEEN BLOCKED BUT TRYIED TO LIST ADMIN"
+		admin.Password = ""
+		audit.Payload = admin
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ADMINID HAS BEEN BLOCKED BUT GOT TOKEN"
+
+		go AdminAudit(audit)
+		go DeveloperAudit(dev)
+		return response
+	}
+	if !admin.CanAlterAdmin {
+		var response models.ListAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Access Denied"
+		response.Listedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ListAdmin"
+		audit.AdminID = admin.AdminID
+		audit.Message = "ADMIN DONT HAVE ACCESS TO ADMIN DATA , BUT TRY TO LIST ADMIN"
+		admin.Password = ""
+		audit.Payload = admin
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+
+		return response
+	}
+	var data []models.ListAdmin
+	query := bson.D{}
+
+	if !input.FromDate.IsZero() || !input.ToDate.IsZero() {
+		if input.ToDate.IsZero() {
+			input.ToDate = time.Now()
+		} else if input.FromDate.IsZero() {
+			input.FromDate = time.Now().AddDate(-1, 0, 0)
+		}
+		query = append(query, bson.E{Key: "createdtime", Value: bson.M{"$gte": input.FromDate, "$lte": input.ToDate}})
+		log.Println("In time Query")
+	}
+	if input.IsBlocked == "TRUE" {
+		query = append(query, bson.E{Key: "isblocked", Value: true})
+	} else if input.IsBlocked == "FALSE" {
+		query = append(query, bson.E{Key: "isblocked", Value: false})
+	}
+
+	if input.CanUpdate == "TRUE" {
+		query = append(query, bson.E{Key: "canupdate", Value: true})
+	} else if input.CanUpdate == "FALSE" {
+		query = append(query, bson.E{Key: "canupdate", Value: false})
+	}
+
+	if input.CanDelete == "TRUE" {
+		query = append(query, bson.E{Key: "candelete", Value: true})
+	} else if input.CanDelete == "FALSE" {
+		query = append(query, bson.E{Key: "candelete", Value: false})
+	}
+
+	if input.CanAlterAdmin == "TRUE" {
+		query = append(query, bson.E{Key: "canalteradmin", Value: true})
+	} else if input.CanAlterAdmin == "FALSE" {
+		query = append(query, bson.E{Key: "canalteradmin", Value: false})
+	}
+
+	if input.SearchBY != "" && input.SearchValue != "" {
+		query = append(query, bson.E{Key: input.SearchBY, Value: input.SearchValue})
+	}
+
+	findOptions := options.Find()
+	if input.SortBy != "" {
+		sort := bson.D{{Key: input.SortBy, Value: input.SortOrder}}
+		findOptions.SetSort(sort)
+	} else {
+		sort := bson.D{{Key: "createdtime", Value: -1}}
+		findOptions.SetSort(sort)
+	}
+
+	if input.NoofData == 0 {
+		input.NoofData = 10
+	}
+
+	cursor, err := config.Admin_Collection.Find(context.Background(), query, findOptions)
+	if err != nil {
+		var response models.ListAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Error while Listing"
+		response.Listedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ListAdmin"
+		audit.AdminID = admin.AdminID
+		audit.Message = "ERROR WHILE LISTING DATA OF ADMIN"
+		admin.Password = ""
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+		audit.Error = err
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ERROR WHILE LISTING DATA OF ADMIN"
+
+		go AdminAudit(audit)
+		go DeveloperAudit(dev)
+		return response
+	}
+	for cursor.Next(context.Background()) {
+
+		if input.NoofData == 0 {
+			break
+		}
+		input.NoofData--
+		var admindata models.ListAdmin
+		err = cursor.Decode(&admindata)
+		if err != nil {
+			var response models.ListAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "Error while Listing"
+			response.Listedtime = time.Now()
+			response.Error = err
+
+			var audit models.AdminAudit
+			audit.APIName = "ListAdmin"
+			audit.AdminID = admin.AdminID
+			audit.Message = "ERROR WHILE LISTING DATA OF ADMIN"
+			admin.Password = ""
+			audit.Payload = input
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+			audit.Error = err
+
+			var dev models.DeveloperAudit
+			dev.Audit = audit
+			dev.Message = "ERROR WHILE DECODING DATA OF ADMIN"
+
+			go AdminAudit(audit)
+			go DeveloperAudit(dev)
+			return response
+		}
+		data = append(data, admindata)
+
+	}
+
+	response := models.ListAdminResponse{
+		Status:     "SUCCESS",
+		StatusCode: "200",
+		Message:    "Listed Successfully",
+		Listedtime: time.Now(),
+		Data:       data,
+	}
+
+	var audit models.AdminAudit
+	audit.APIName = "ListAdmin"
+	audit.AdminID = admin.AdminID
+	audit.Message = "LISTED SUCCESSFULLY"
+	audit.Payload = input
+	audit.ServiceName = "Admin"
+	audit.Status = 200
+	audit.StatusMessage = "SUCCESS"
+	audit.Response = response
+	audit.Error = err
+	go AdminAudit(audit)
+
+	return response
+
+}
+
+func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
+
+	if len(input.Token) < 20 || len(input.PublicKey) < 30 || !IsValidEmail(input.Email) || len(input.Reason) < 10 {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Wrong Input Data"
+		response.DeletedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "INVALID INPUT"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	if input.Email == constants.AdminEmail {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "You can not Delete Super Admin"
+		response.DeletedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "TRYIED TO DELETE SUPER ADMIN"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
+	if err != nil {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Login Expired"
+		response.DeletedTime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "LOGIN EXPIRED"
+		audit.Error = err
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+
+		return response
+	}
+	var admin models.AdminData
+	filter := bson.M{"adminid": id}
+	projection := bson.M{
+		"_id":           0,
+		"adminid":       1,
+		"adminname":     1,
+		"canalteradmin": 1,
+		"isblocked":     1,
+		"email":         1,
+	}
+	option := options.FindOne().SetProjection(projection)
+	err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&admin)
+	if err != nil {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Error in Deleting"
+		response.DeletedTime = time.Now()
+		response.Error = err
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "ERROR WHILE PROCESSING"
+		audit.Error = err
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ADMIN ID NOT FOUND IN DB BUT HAS TOKEN"
+
+		go AdminAudit(audit)
+		go DeveloperAudit(dev)
+		return response
+	}
+	if admin.Email == input.Email {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "You can not Delete YourSelf"
+		response.DeletedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = id
+		audit.Message = "ADMIN TRYIED TO DELETE SAME ADMIN"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+		return response
+	}
+	if admin.IsBlocked {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Your ID has been Blocked"
+		response.DeletedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = admin.AdminID
+		audit.Message = "ADMIN ID HAS BEEN BLOCKED BUT TRYIED TO DELETE ADMIN"
+		admin.Password = ""
+		audit.Payload = admin
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ADMINID HAS BEEN BLOCKED BUT GOT TOKEN"
+
+		go AdminAudit(audit)
+		go DeveloperAudit(dev)
+		return response
+	}
+	if !admin.CanAlterAdmin {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Access Denied"
+		response.DeletedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = admin.AdminID
+		audit.Message = "ADMIN DONT HAVE ACCESS TO ADMIN DATA , BUT TRY TO DELETE ADMIN"
+		admin.Password = ""
+		audit.Payload = admin
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+
+		return response
+	}
+	var deletingadmin models.AdminData
+	filter = bson.M{"email": input.Email}
+	err = config.Admin_Collection.FindOne(context.Background(), filter).Decode(&deletingadmin)
+	if err != nil {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Email not found"
+		response.DeletedTime = time.Now()
+		response.Error = err
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = id
+		audit.Message = "ERROR ADMIN WITH THE GIVEN EMAIL NOT FOUND"
+		audit.Error = err
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+
+		return response
+	}
+	var deleteAdminDb models.DeleteAdmin
+	deleteAdminDb.DeleteID = GenerateUniqueDeleteID()
+	deleteAdminDb.DeletedTime = time.Now()
+	deleteAdminDb.Deleteddata = deletingadmin
+	deleteAdminDb.DeleterEmail = admin.Email
+	deleteAdminDb.DeleterID = id
+	deleteAdminDb.DeleterName = admin.AdminName
+	deleteAdminDb.Reason = input.Reason
+	_, err = config.AdminDeleted_Collection.InsertOne(context.Background(), deleteAdminDb)
+	if err != nil {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Error in Deleting"
+		response.DeletedTime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = id
+		audit.Message = "ERROR WHILE ADDING DATA TO DELETED ADMIN DATABASE"
+		audit.Error = err
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ERROR WHILE INSERTING DATA TO DELETED ADMIN COLLECTION"
+		go DeveloperAudit(dev)
+		go AdminAudit(audit)
+		return response
+	}
+
+	_, err = config.Admin_Collection.DeleteOne(context.Background(), filter)
+	if err != nil {
+		var response models.DeleteAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Error in Deleting"
+		response.DeletedTime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "DeleteAdmin"
+		audit.AdminID = id
+		audit.Message = "ERROR WHILE DELETING DATA "
+		audit.Error = err
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ERROR WHILE DELETING DATA IN ADMIN COLLECTION"
+		go DeveloperAudit(dev)
+		go AdminAudit(audit)
+		return response
+	}
+
+	var response models.DeleteAdminResponse
+	response.StatusCode = "200"
+	response.Status = "SUCCESS"
+	response.Message = "Admin Deleted Successfully"
+	response.DeletedTime = time.Now()
+
+	var audit models.AdminAudit
+	audit.APIName = "DeleteAdmin"
+	audit.AdminID = id
+	audit.Message = "DELETED SUCCESSFULLY"
+	audit.Payload = input
+	audit.ServiceName = "Admin"
+	audit.Status = 200
+	audit.StatusMessage = "SUCCESS"
+	audit.Response = response
+
+	go AdminAudit(audit)
+	return response
+}
+
+func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
+	if len(input.Token) < 20 || len(input.PublicKey) < 30 || !IsValidEmail(input.Email) || len(input.Reason) < 10 || len(input.UpdateFeild) < 1 || input.UpdateValue == "" {
+		var response models.EditAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Wrong Input Data"
+		response.EditedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "EditAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "INVALID INPUT"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	if input.UpdateFeild == "adminname" || input.UpdateFeild == "ip" || input.UpdateFeild == "wronginput" || input.UpdateFeild == "candelete" || input.UpdateFeild == "canupdate" || input.UpdateFeild == "canalteradmin" {
+
+		if input.Email == constants.AdminEmail {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "You can not Edit Super Admin"
+			response.EditedTime = time.Now()
+
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = "NOT FOUND"
+			audit.Message = "TRYIED TO EDIT SUPER ADMIN"
+			audit.Payload = input
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+
+			go AdminAudit(audit)
+			return response
+		}
+
+		id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
+		if err != nil {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "Login Expired"
+			response.EditedTime = time.Now()
+			response.Error = err
+
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = "NOT FOUND"
+			audit.Message = "LOGIN EXPIRED"
+			audit.Error = err
+			audit.Payload = input
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+			go AdminAudit(audit)
+
+			return response
+		}
+		var admin models.AdminData
+		filter := bson.M{"adminid": id}
+		projection := bson.M{
+			"_id":           0,
+			"adminid":       1,
+			"adminname":     1,
+			"canalteradmin": 1,
+			"isblocked":     1,
+			"email":         1,
+		}
+		option := options.FindOne().SetProjection(projection)
+		err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&admin)
+		if err != nil {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "Error in Editing"
+			response.EditedTime = time.Now()
+			response.Error = err
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = "NOT FOUND"
+			audit.Message = "ERROR WHILE EDITING"
+			audit.Error = err
+			audit.Payload = input
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+
+			var dev models.DeveloperAudit
+			dev.Audit = audit
+			dev.Message = "ADMIN ID NOT FOUND IN DB BUT HAS TOKEN"
+
+			go AdminAudit(audit)
+			go DeveloperAudit(dev)
+			return response
+		}
+		if admin.Email == input.Email {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "You can not Edit YourSelf"
+			response.EditedTime = time.Now()
+
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = id
+			audit.Message = "ADMIN TRYIED TO EDIT SAME ADMIN"
+			audit.Payload = input
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+
+			go AdminAudit(audit)
+			return response
+		}
+		if admin.IsBlocked {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "Your ID has been Blocked"
+			response.EditedTime = time.Now()
+
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = admin.AdminID
+			audit.Message = "ADMIN ID HAS BEEN BLOCKED BUT TRYIED TO EDIT ADMIN"
+			admin.Password = ""
+			audit.Payload = admin
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+
+			var dev models.DeveloperAudit
+			dev.Audit = audit
+			dev.Message = "ADMINID HAS BEEN BLOCKED BUT GOT TOKEN"
+
+			go AdminAudit(audit)
+			go DeveloperAudit(dev)
+			return response
+		}
+		if !admin.CanAlterAdmin {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "Access Denied"
+			response.EditedTime = time.Now()
+
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = admin.AdminID
+			audit.Message = "ADMIN DONT HAVE ACCESS TO ADMIN DATA , BUT TRY TO EDIT ADMIN"
+			admin.Password = ""
+			audit.Payload = admin
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+
+			go AdminAudit(audit)
+
+			return response
+		}
+		var editingadmin models.AdminData
+		filter = bson.M{"email": input.Email}
+		projection = bson.M{
+			"_id":             0,
+			"adminid":         1,
+			"canalteradmin":   1,
+			"isblocked":       1,
+			"email":           1,
+			input.UpdateFeild: 1,
+		}
+		option = options.FindOne().SetProjection(projection)
+		err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&editingadmin)
+		if err != nil {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "Email not found"
+			response.EditedTime = time.Now()
+			response.Error = err
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = id
+			audit.Message = "ERROR ADMIN WITH THE GIVEN EMAIL NOT FOUND"
+			audit.Error = err
+			audit.Payload = input
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+
+			go AdminAudit(audit)
+
+			return response
+		}
+		editdata := models.EditAdmin{
+			EditID:           GenerateUniqueEditID(),
+			EditedByName:     admin.AdminName,
+			EditedById:       admin.AdminID,
+			EditedByEmail:    admin.Email,
+			FeildUpdated:     input.UpdateFeild,
+			NewValueUpdated:  input.UpdateValue,
+			Reason:           input.Reason,
+			AdminEditedID:    editingadmin.AdminID,
+			AdminEditedEmail: editingadmin.Email,
+		
+		}
+		if input.UpdateFeild == "adminname" {
+			editdata.OldValue = editingadmin.AdminName
+		} else if input.UpdateFeild == "ip" {
+			editdata.OldValue = editingadmin.IP_Address
+		} else if input.UpdateFeild == "wronginput" {
+			editdata.OldValue = editingadmin.WrongInput
+		} else if input.UpdateFeild == "canupdate" {
+			editdata.OldValue = editingadmin.CanUpdateData
+		} else if input.UpdateFeild == "candelete" {
+			editdata.OldValue = editingadmin.CanDeleteData
+		} else if input.UpdateFeild == "canalteradmin" {
+			editdata.OldValue = editingadmin.CanAlterAdmin
+		}
+		_, err = config.AdminEdited_Collection.InsertOne(context.Background(), editdata)
+		if err != nil {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "Error in Editing"
+			response.EditedTime = time.Now()
+			response.Error = err
+
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = id
+			audit.Message = "ERROR WHILE ADDING DATA TO EDIT ADMIN DATABASE"
+			audit.Error = err
+			audit.Payload = input
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+
+			var dev models.DeveloperAudit
+			dev.Audit = audit
+			dev.Message = "ERROR WHILE INSERTING DATA TO EDIT ADMIN COLLECTION"
+			go DeveloperAudit(dev)
+			go AdminAudit(audit)
+			return response
+		}
+
+		filter = bson.M{"adminid": editingadmin.AdminID}
+		update := bson.M{"$set": bson.M{input.UpdateFeild: input.UpdateValue}}
+		options := options.Update()
+		_, err = config.Admin_Collection.UpdateOne(context.Background(), filter, update, options)
+		if err != nil {
+			var response models.EditAdminResponse
+			response.StatusCode = "200"
+			response.Status = "FAILED"
+			response.Message = "Error in Editing"
+			response.EditedTime = time.Now()
+			response.Error = err
+
+			var audit models.AdminAudit
+			audit.APIName = "EditAdmin"
+			audit.AdminID = id
+			audit.Message = "ERROR WHILE UPDATING DATA"
+			audit.Error = err
+			audit.Payload = input
+			audit.ServiceName = "Admin"
+			audit.Status = 200
+			audit.StatusMessage = "FAILED"
+			audit.Response = response
+
+			var dev models.DeveloperAudit
+			dev.Audit = audit
+			dev.Message = "ERROR WHILE UPDATING DATA IN ADMIN COLLECTION"
+			go DeveloperAudit(dev)
+			go AdminAudit(audit)
+			filter = bson.M{"editid": editdata.EditID}
+			_, err = config.AdminEdited_Collection.DeleteOne(context.Background(), editdata)
+			if err != nil {
+				var response models.EditAdminResponse
+				response.StatusCode = "200"
+				response.Status = "FAILED"
+				response.Message = "Error in Editing"
+				response.EditedTime = time.Now()
+				response.Error = err
+
+				var audit models.AdminAudit
+				audit.APIName = "EditAdmin"
+				audit.AdminID = id
+				audit.Message = "ERROR WHILE DELETING DATA IN EDIT ADMIN DB BECAUSE EDIT FAILED"
+				audit.Error = err
+				audit.Payload = input
+				audit.ServiceName = "Admin"
+				audit.Status = 200
+				audit.StatusMessage = "FAILED"
+				audit.Response = response
+
+				var dev models.DeveloperAudit
+				dev.Audit = audit
+				dev.Message = "ERROR WHILE DELETING DATA IN EDIT ADMIN COLLECTION BECAUSE EDIT ADMIN FAILED"
+				go DeveloperAudit(dev)
+				go AdminAudit(audit)
+			}
+			return response
+		}
+		var response models.EditAdminResponse
+		response.StatusCode = "200"
+		response.Status = "SUCCESS"
+		response.Message = "Edited Successfully"
+		response.EditedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "EditAdmin"
+		audit.AdminID = id
+		audit.Message = "EDITED SUCCESSFULLY"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "SUCCESS"
+		audit.Response = response
+		go AdminAudit(audit)
+
+		return response
+	} else {
+		var response models.EditAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Not allowed to update " + input.UpdateFeild
+		response.EditedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "EditAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "NOT ALLOWED TO UPDATE" + input.UpdateFeild
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Response = response
+
+		go AdminAudit(audit)
+		return response
+	}
 }
 
 // TO get all Customer
@@ -1003,8 +1915,8 @@ func CreateAdmin(admin models.AdminSignup) models.CreateAdminResponse {
 // 	return nil
 // }
 
-// // Get Event from Calender
-// func GetEvent(GetData models.GetCalender) ([]models.UploadCalender, error) {
+// // Get Event input.FromDate Calender
+// input.ToDate func GetEvent(GetData models.GetCalender) ([]models.UploadCalender, error) {
 // 	filter := bson.M{"email": GetData.AdminEmail}
 // 	cursor, err := config.Product_Collection.Find(context.Background(), filter)
 // 	var Data []models.UploadCalender

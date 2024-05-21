@@ -12,11 +12,11 @@ func Router() *gin.Engine {
 	router.Use(controller.CorsMiddleware())
 	//Serve static files for specific routes
 	router.Static("/admin/signin", "./frontend/admin/signin")
-	router.Static("/admin/dashboard","./frontend/admin/dashboard")
+	router.Static("/admin/dashboard", "./frontend/admin/dashboard")
 	router.Static("/home", "./frontend/home")
 	router.Static("/signup", "./frontend/signup")
 	router.Static("/signin", "./frontend/signin")
-	router.Static("/seller/signin","./frontend/seller/signin")
+	router.Static("/seller/signin", "./frontend/seller/signin")
 	router.Static("/seller/signup", "./frontend/seller/signup")
 	router.Static("/seller/dashboard", "./frontend/seller/dashboard")
 
@@ -52,11 +52,15 @@ func Router() *gin.Engine {
 	// router.POST("/deleteorder",controller.DeleteOrder)
 	// router.POST("/customerorders",controller.CustomerOrder)
 	// router.POST("/validatetoken", controller.ValidateToken)
-	 router.POST("/adminlogin", controller.AdminLogin)
+	router.POST("/adminlogin", controller.AdminLogin)
+	router.POST("/listadmin", controller.ListAdmin)
+	router.POST("/deleteadmin",controller.DeleteAdmin)
+	router.POST("/editadmin",controller.EditAdmin)
+
 	// router.POST("/adminpage", controller.GetAllDetailsForAdmin)
 	// router.POST("/getworkers", controller.GetWorkers)
 	// router.POST("/createworker",controller.CreateWorker)
-	// router.POST("/createadmin",controller.CreateAdmin)
+	router.POST("/createadmin", controller.CreateAdmin)
 	// router.POST("/addevent",controller.AddEvent)
 	// router.POST("/getevent",controller.GetEvent)
 	// router.POST("/block",controller.Block)
@@ -80,7 +84,6 @@ func Router() *gin.Engine {
 	// router.POST("/getallnotapprovedseller",controller.GetAllNotApprovedSeller)
 	// router.POST("/approveseller",controller.ApproveSeller)
 	// router.POST("/getallorders",controller.GetAllOrders)
-
 
 	return router
 }

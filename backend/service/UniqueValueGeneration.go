@@ -41,6 +41,15 @@ func GenerateUniqueProductCartID() string {
 	return fmt.Sprintf("%d%s", time.Now().UnixNano(), GetRandomString(12))
 }
 
+func GenerateUniqueDeleteID() string {
+	return fmt.Sprintf("%d%s", time.Now().UnixNano(), GetRandomString(12))
+}
+
+
+func GenerateUniqueEditID() string {
+	return fmt.Sprintf("%d%s", time.Now().UnixNano(), GetRandomString(12))
+}
+
 // Custom function to generate random characters (for demonstration purposes)
 func GetRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
