@@ -113,4 +113,6 @@ const (
 	AdminEdited_Collection       = "EDITED_ADMIN"
 	UserEdited_Collection        = "EDITED_USER"
 	OrderEdited_Collection       = "EDITED_ORDER"
+	AdminBlocked_Collection      = "BLOCKED_ADMIN"
+	UserBlocked_Collection       = "BLOCKED_USER"
 )

@@ -35,6 +35,8 @@ var (
 	AdminEdited_Collection       *mongo.Collection
 	UserEdited_Collection        *mongo.Collection
 	OrderEdited_Collection       *mongo.Collection
+	AdminBlocked_Collection      *mongo.Collection
+	UserBlocked_Collection       *mongo.Collection
 )
 
 func init() {
@@ -74,5 +76,7 @@ func init() {
 	AdminEdited_Collection = client.Database(constants.DataBaseName).Collection(constants.AdminEdited_Collection)
 	UserEdited_Collection = client.Database(constants.DataBaseName).Collection(constants.UserEdited_Collection)
 	OrderEdited_Collection = client.Database(constants.DataBaseName).Collection(constants.OrderEdited_Collection)
+	AdminBlocked_Collection = client.Database(constants.DataBaseName).Collection(constants.AdminBlocked_Collection)
+	UserBlocked_Collection = client.Database(constants.DataBaseName).Collection(constants.UserBlocked_Collection)
 	fmt.Println("****** Collections Created ******")
 }

@@ -11,13 +11,13 @@ import (
 
 // Admin Login
 func AdminLogin(c *gin.Context) {
-	var login models.AdminSignin
+	var login models.AdminLoginRequest
 	if err := c.BindJSON(&login); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
 	}
 
-	result := service.AdminLoginCheck(login)
+	result := service.AdminLogin(login)
 	if result.Status == "FAILED" {
 		c.JSON(http.StatusOK, gin.H{"error": result})
 		return
@@ -28,7 +28,7 @@ func AdminLogin(c *gin.Context) {
 
 // Create Admin
 func CreateAdmin(c *gin.Context) {
-	var admin models.AdminSignup
+	var admin models.CreateAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -41,9 +41,9 @@ func CreateAdmin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"result": result})
 }
 
-//List Admin
-func ListAdmin(c *gin.Context){
-	var admin models.ListInput
+// List Admin
+func ListAdmin(c *gin.Context) {
+	var admin models.ListAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -56,8 +56,8 @@ func ListAdmin(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"result": result})
 }
 
-//Delete Admin
-func DeleteAdmin(c *gin.Context){
+// Delete Admin
+func DeleteAdmin(c *gin.Context) {
 	var admin models.DeleteAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
@@ -71,8 +71,8 @@ func DeleteAdmin(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"result": result})
 }
 
-//Delete Admin
-func EditAdmin(c *gin.Context){
+// Delete Admin
+func EditAdmin(c *gin.Context) {
 	var admin models.EditAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
@@ -86,6 +86,125 @@ func EditAdmin(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{"result": result})
 }
 
+// ViewAdmin Admin
+func ViewAdmin(c *gin.Context) {
+	var admin models.ViewAdminRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ViewAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+// BlockorUnblockAdmin Admin
+func BlockorUnblockAdmin(c *gin.Context) {
+	var admin models.BlockorUnblockAdminRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.BlockorUnblockAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+// ListAdminAudit Admin
+func ListAdminAudit(c *gin.Context) {
+	var admin models.ListAdminAuditRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ListAdminAudit(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+// ListDeveloperAudit Admin
+func ListDeveloperAudit(c *gin.Context) {
+	var admin models.ListDeveloperAuditRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ListDeveloperAudit(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+// ListEditedAdmin Admin
+func ListEditedAdmin(c *gin.Context) {
+	var admin models.ListEditedAdminRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ListEditedAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+// ListDeletedAdmin Admin
+func ListDeletedAdmin(c *gin.Context) {
+	var admin models.ListDeletedAdminRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ListDeletedAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+// ListBlockedAdmin Admin
+func ListBlockedAdmin(c *gin.Context) {
+	var admin models.ListBlockedAdminRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ListBlockedAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
+// ValidateAdminToken Admin
+func ValidateAdminToken(c *gin.Context) {
+	var admin models.ValidateAdminTokenRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ValidateAdminToken(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
 
 // // Get all Inventory Data
 // func Getinventorydata(c *gin.Context) {
@@ -141,8 +260,6 @@ func EditAdmin(c *gin.Context){
 // 	data := service.CreateWorker(worker)
 // 	c.JSON(http.StatusOK, gin.H{"result": data})
 // }
-
-
 
 // // Create Seller
 // func CreateSeller(c *gin.Context) {
