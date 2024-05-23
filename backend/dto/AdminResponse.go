@@ -1,6 +1,9 @@
 package dto
 
-import "time"
+import (
+	"mithuorganics/models"
+	"time"
+)
 
 // Edit Admin Response
 type EditAdminResponse struct {
@@ -60,22 +63,22 @@ type CreateAdminResponse struct {
 
 // List Deleted Admin Response
 type ListDeletedAdminResponse struct {
-	Status     string        `bson:"status" json:"status"`
-	StatusCode string        `bson:"statuscode" json:"statuscode"`
-	Message    string        `bson:"message" json:"message"`
-	Error      error         `bson:"error,omitempty" json:"error,omitempty"`
-	Listedtime time.Time     `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
-	Data       []DeleteAdmin `bson:"data,omitempty" json:"data,omitempty"`
+	Status     string               `bson:"status" json:"status"`
+	StatusCode string               `bson:"statuscode" json:"statuscode"`
+	Message    string               `bson:"message" json:"message"`
+	Error      error                `bson:"error,omitempty" json:"error,omitempty"`
+	Listedtime time.Time            `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
+	Data       []models.DeletedAdmin `bson:"data,omitempty" json:"data,omitempty"`
 }
 
 // List Blocked Admin Response
 type ListBlockedAdminResponse struct {
-	Status     string                `bson:"status" json:"status"`
-	StatusCode string                `bson:"statuscode" json:"statuscode"`
-	Message    string                `bson:"message" json:"message"`
-	Error      error                 `bson:"error,omitempty" json:"error,omitempty"`
-	Listedtime time.Time             `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
-	Data       []BlockorUnblockAdmin `bson:"data,omitempty" json:"data,omitempty"`
+	Status     string                       `bson:"status" json:"status"`
+	StatusCode string                       `bson:"statuscode" json:"statuscode"`
+	Message    string                       `bson:"message" json:"message"`
+	Error      error                        `bson:"error,omitempty" json:"error,omitempty"`
+	Listedtime time.Time                    `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
+	Data       []models.BlockorUnblockAdmin `bson:"data,omitempty" json:"data,omitempty"`
 }
 
 // Admin Sign in data
@@ -92,30 +95,50 @@ type AdminLoginResponse struct {
 
 // List Admin Response
 type ListAdminResponse struct {
-	Status     string      `bson:"status" json:"status"`
-	StatusCode string      `bson:"statuscode" json:"statuscode"`
-	Message    string      `bson:"message" json:"message"`
-	Error      error       `bson:"error,omitempty" json:"error,omitempty"`
-	Listedtime time.Time   `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
-	Data       []ListAdmin `bson:"data,omitempty" json:"data,omitempty"`
+	Status     string             `bson:"status" json:"status"`
+	StatusCode string             `bson:"statuscode" json:"statuscode"`
+	Message    string             `bson:"message" json:"message"`
+	Error      error              `bson:"error,omitempty" json:"error,omitempty"`
+	Listedtime time.Time          `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
+	Data       []models.ListAdmin `bson:"data,omitempty" json:"data,omitempty"`
 }
 
 // ListAdmin Audit Response
 type ListAdminAuditResponse struct {
-	Status     string       `bson:"status" json:"status"`
-	StatusCode string       `bson:"statuscode" json:"statuscode"`
-	Message    string       `bson:"message" json:"message"`
-	Error      error        `bson:"error,omitempty" json:"error,omitempty"`
-	Listedtime time.Time    `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
-	Data       []AdminAudit `bson:"data,omitempty" json:"data,omitempty"`
+	Status     string              `bson:"status" json:"status"`
+	StatusCode string              `bson:"statuscode" json:"statuscode"`
+	Message    string              `bson:"message" json:"message"`
+	Error      error               `bson:"error,omitempty" json:"error,omitempty"`
+	Listedtime time.Time           `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
+	Data       []models.AdminAudit `bson:"data,omitempty" json:"data,omitempty"`
 }
 
 // ListDeveloper Audit Response
 type ListDeveloperAuditResponse struct {
-	Status     string           `bson:"status" json:"status"`
-	StatusCode string           `bson:"statuscode" json:"statuscode"`
-	Message    string           `bson:"message" json:"message"`
-	Error      error            `bson:"error,omitempty" json:"error,omitempty"`
-	Listedtime time.Time        `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
-	Data       []DeveloperAudit `bson:"data,omitempty" json:"data,omitempty"`
+	Status     string                  `bson:"status" json:"status"`
+	StatusCode string                  `bson:"statuscode" json:"statuscode"`
+	Message    string                  `bson:"message" json:"message"`
+	Error      error                   `bson:"error,omitempty" json:"error,omitempty"`
+	Listedtime time.Time               `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
+	Data       []models.DeveloperAudit `bson:"data,omitempty" json:"data,omitempty"`
+}
+
+// List Edited Admin Response
+type ListEditedAdminResponse struct {
+	Status     string             `bson:"status" json:"status"`
+	StatusCode string             `bson:"statuscode" json:"statuscode"`
+	Message    string             `bson:"message" json:"message"`
+	Error      error              `bson:"error,omitempty" json:"error,omitempty"`
+	Listedtime time.Time          `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
+	Data       []models.EditedAdmin `bson:"data,omitempty" json:"data,omitempty"`
+}
+
+// Validate Admin Token Response
+type ValidateAdminTokenResponse struct {
+	Status       string    `bson:"status" json:"status"`
+	StatusCode   string    `bson:"statuscode" json:"statuscode"`
+	Message      string    `bson:"message" json:"message"`
+	Error        error     `bson:"error,omitempty" json:"error,omitempty"`
+	Responsetime time.Time `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
+	Valid        bool      `json:"valid" bson:"vaild"`
 }

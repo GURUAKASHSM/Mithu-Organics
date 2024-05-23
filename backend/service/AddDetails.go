@@ -16,7 +16,7 @@ func DetailsToDB() {
 }
 
 func AddDefaultAdmin() {
-	admin := models.AdminData{
+	admin := models.Admin{
 		AdminName:     constants.AdminName,
 		AdminID:       GenerateUniqueAdminID(),
 		Email:         constants.AdminEmail,
@@ -93,7 +93,7 @@ func AddDefaultAdmin() {
 			{"adminid": admin.AdminID},
 		},
 	}
-	var data models.AdminData
+	var data models.Admin
 	err = config.Admin_Collection.FindOne(context.Background(), filter).Decode(&data)
 	if err == nil {
 		var audit models.AdminAudit

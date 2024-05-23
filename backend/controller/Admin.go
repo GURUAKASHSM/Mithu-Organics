@@ -2,7 +2,7 @@ package controller
 
 import (
 	//"log"
-	"mithuorganics/models"
+	dto "mithuorganics/dto"
 	"mithuorganics/service"
 	"net/http"
 
@@ -11,7 +11,7 @@ import (
 
 // Admin Login
 func AdminLogin(c *gin.Context) {
-	var login models.AdminLoginRequest
+	var login dto.AdminLoginRequest
 	if err := c.BindJSON(&login); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -28,7 +28,7 @@ func AdminLogin(c *gin.Context) {
 
 // Create Admin
 func CreateAdmin(c *gin.Context) {
-	var admin models.CreateAdminRequest
+	var admin dto.CreateAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -43,7 +43,7 @@ func CreateAdmin(c *gin.Context) {
 
 // List Admin
 func ListAdmin(c *gin.Context) {
-	var admin models.ListAdminRequest
+	var admin dto.ListAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -58,7 +58,7 @@ func ListAdmin(c *gin.Context) {
 
 // Delete Admin
 func DeleteAdmin(c *gin.Context) {
-	var admin models.DeleteAdminRequest
+	var admin dto.DeleteAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -73,7 +73,7 @@ func DeleteAdmin(c *gin.Context) {
 
 // Delete Admin
 func EditAdmin(c *gin.Context) {
-	var admin models.EditAdminRequest
+	var admin dto.EditAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -88,7 +88,7 @@ func EditAdmin(c *gin.Context) {
 
 // ViewAdmin Admin
 func ViewAdmin(c *gin.Context) {
-	var admin models.ViewAdminRequest
+	var admin dto.ViewAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -103,7 +103,7 @@ func ViewAdmin(c *gin.Context) {
 
 // BlockorUnblockAdmin Admin
 func BlockorUnblockAdmin(c *gin.Context) {
-	var admin models.BlockorUnblockAdminRequest
+	var admin dto.BlockorUnblockAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -118,7 +118,7 @@ func BlockorUnblockAdmin(c *gin.Context) {
 
 // ListAdminAudit Admin
 func ListAdminAudit(c *gin.Context) {
-	var admin models.ListAdminAuditRequest
+	var admin dto.ListAdminAuditRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -133,7 +133,7 @@ func ListAdminAudit(c *gin.Context) {
 
 // ListDeveloperAudit Admin
 func ListDeveloperAudit(c *gin.Context) {
-	var admin models.ListDeveloperAuditRequest
+	var admin dto.ListDeveloperAuditRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -148,7 +148,7 @@ func ListDeveloperAudit(c *gin.Context) {
 
 // ListEditedAdmin Admin
 func ListEditedAdmin(c *gin.Context) {
-	var admin models.ListEditedAdminRequest
+	var admin dto.ListEditedAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -163,7 +163,7 @@ func ListEditedAdmin(c *gin.Context) {
 
 // ListDeletedAdmin Admin
 func ListDeletedAdmin(c *gin.Context) {
-	var admin models.ListDeletedAdminRequest
+	var admin dto.ListDeletedAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -178,7 +178,7 @@ func ListDeletedAdmin(c *gin.Context) {
 
 // ListBlockedAdmin Admin
 func ListBlockedAdmin(c *gin.Context) {
-	var admin models.ListBlockedAdminRequest
+	var admin dto.ListBlockedAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
@@ -193,7 +193,7 @@ func ListBlockedAdmin(c *gin.Context) {
 
 // ValidateAdminToken Admin
 func ValidateAdminToken(c *gin.Context) {
-	var admin models.ValidateAdminTokenRequest
+	var admin dto.ValidateAdminTokenRequest
 	if err := c.BindJSON(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return

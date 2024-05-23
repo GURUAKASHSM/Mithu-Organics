@@ -6,25 +6,21 @@ import (
 	"mithuorganics/config"
 	"mithuorganics/constants"
 
-	//"mithuorganics/constants"
-	// "fmt"
-	// "log"
+	dto "mithuorganics/dto"
 	"mithuorganics/models"
-	// "os"
-	// "strconv"
+
+
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	// "go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/mongo/options"
+
 )
 
 // Admin Login
-func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
+func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 	if !IsValidEmail(login.Email) || len(login.Password) <= 5 || !IsValidIP(login.IP_Address) || !IsValidTOTP(login.TOTP) {
-		var response models.AdminLoginResponse
+		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -44,12 +40,12 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 		return response
 
 	}
-	var correctdata models.AdminData
+	var correctdata models.Admin
 	filter := bson.M{"email": login.Email}
 	err := config.Admin_Collection.FindOne(context.Background(), filter).Decode(&correctdata)
 	if err != nil {
 
-		var response models.AdminLoginResponse
+		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Username or Password"
@@ -72,7 +68,7 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 	}
 
 	if correctdata.IsBlocked {
-		var response models.AdminLoginResponse
+		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "You are not allowed to login"
@@ -93,7 +89,7 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 	}
 
 	if correctdata.WrongInput == 4 {
-		var response models.AdminLoginResponse
+		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Maximum no of Try Reached"
@@ -114,7 +110,7 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 	}
 	if correctdata.IP_Address != login.IP_Address {
 
-		var response models.AdminLoginResponse
+		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "It's not your Valid IP to Login"
@@ -139,7 +135,7 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 
 	}
 	if (correctdata.Password) != HashAdminPassword(login.Password) {
-		var response models.AdminLoginResponse
+		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Username or Password"
@@ -164,7 +160,7 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 	}
 
 	if false && !ValidateOTP(login.TOTP, correctdata.SecretKey) {
-		var response models.AdminLoginResponse
+		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Invalid TOTP"
@@ -189,9 +185,9 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 
 	}
 
-	token, err := CreateToken(models.AdminTokenData{AdminID: correctdata.AdminID, Email: login.Email}, []byte(correctdata.PrivateKey), 1, constants.AdminTokenKey)
+	token, err := CreateToken(dto.AdminTokenData{AdminID: correctdata.AdminID, Email: login.Email}, []byte(correctdata.PrivateKey), 1, constants.AdminTokenKey)
 	if err != nil {
-		var response models.AdminLoginResponse
+		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Processing"
@@ -219,7 +215,7 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 		return response
 
 	}
-	var response models.AdminLoginResponse
+	var response dto.AdminLoginResponse
 	response.StatusCode = "200"
 	response.Status = "SUCCESS"
 	response.Message = "Login Successfull"
@@ -273,10 +269,10 @@ func AdminLogin(login models.AdminLoginRequest) models.AdminLoginResponse {
 }
 
 // Create Admin
-func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
+func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 	log.Println(len(admin.FromAdminToken) < 20, len(admin.FromAdminPublicKey) < 30, len(admin.AdminName) <= 4, !IsValidEmail(admin.Email), !IsValidIP(admin.IP_Address), len(admin.Password) <= 5, len(admin.ConfirmPassword) <= 5, len(admin.Password) != len(admin.ConfirmPassword))
 	if len(admin.FromAdminToken) < 20 || len(admin.FromAdminPublicKey) < 30 || len(admin.AdminName) <= 4 || !IsValidEmail(admin.Email) || !IsValidIP(admin.IP_Address) || len(admin.Password) <= 5 || len(admin.ConfirmPassword) <= 5 || len(admin.Password) != len(admin.ConfirmPassword) {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -298,7 +294,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 	}
 	id, err := ExtractID(admin.FromAdminToken, []byte(admin.FromAdminPublicKey), "adminid", constants.AdminTokenKey)
 	if err != nil {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -319,7 +315,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 		return response
 
 	}
-	var fromAdmin models.AdminData
+	var fromAdmin models.Admin
 	filter := bson.M{"adminid": id}
 	projection := bson.M{
 		"_id":           0,
@@ -332,7 +328,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 	options := options.FindOne().SetProjection(projection)
 	err = config.Admin_Collection.FindOne(context.Background(), filter, options).Decode(&fromAdmin)
 	if err != nil {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error in Creating"
@@ -358,7 +354,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 		return response
 	}
 	if fromAdmin.IsBlocked {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Your ID has been Blocked"
@@ -386,7 +382,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 	}
 
 	if !fromAdmin.CanAlterAdmin {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -408,7 +404,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 		return response
 	}
 	if admin.Password != admin.ConfirmPassword {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Password Mismatch"
@@ -429,7 +425,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 		return response
 	}
 
-	admindata := models.AdminData{
+	admindata := models.Admin{
 		AdminName:     admin.AdminName,
 		AdminID:       GenerateUniqueAdminID(),
 		Email:         admin.Email,
@@ -447,7 +443,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 	}
 	pvt, pub, err := GenerateRSAKeyPair()
 	if err != nil {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Processing"
@@ -476,7 +472,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 	admindata.PublicKey = string(pub)
 	seceret, err := GenerateSecret()
 	if err != nil {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Processing"
@@ -512,7 +508,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 
 	result := config.Admin_Collection.FindOne(context.Background(), filter)
 	if result.Err() == nil {
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Admin Already exists"
@@ -533,7 +529,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 	} else {
 		_, err = config.Admin_Collection.InsertOne(context.Background(), admindata)
 		if err != nil {
-			var response models.CreateAdminResponse
+			var response dto.CreateAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Creating"
@@ -560,7 +556,7 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 			go DeveloperAudit(dev)
 			return response
 		}
-		var response models.CreateAdminResponse
+		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "SUCCESS"
 		response.Message = "Admin Created Successfully"
@@ -583,9 +579,9 @@ func CreateAdmin(admin models.CreateAdminRequest) models.CreateAdminResponse {
 }
 
 // List Admin
-func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
+func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 || (input.SearchBY == "" && input.SearchValue != "") || (input.SearchValue == "" && input.SearchBY != "") {
-		var response models.ListAdminResponse
+		var response dto.ListAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -605,7 +601,7 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 	}
 	id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
 	if err != nil {
-		var response models.ListAdminResponse
+		var response dto.ListAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -626,7 +622,7 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 
 		return response
 	}
-	var admin models.AdminData
+	var admin models.Admin
 	filter := bson.M{"adminid": id}
 	projection := bson.M{
 		"_id":           0,
@@ -637,7 +633,7 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 	option := options.FindOne().SetProjection(projection)
 	err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&admin)
 	if err != nil {
-		var response models.ListAdminResponse
+		var response dto.ListAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error in Listing"
@@ -662,7 +658,7 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 		return response
 	}
 	if admin.IsBlocked {
-		var response models.ListAdminResponse
+		var response dto.ListAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Your ID has been Blocked"
@@ -687,7 +683,7 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 		return response
 	}
 	if !admin.CanAlterAdmin {
-		var response models.ListAdminResponse
+		var response dto.ListAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -762,7 +758,7 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 
 	cursor, err := config.Admin_Collection.Find(context.Background(), query, findOptions)
 	if err != nil {
-		var response models.ListAdminResponse
+		var response dto.ListAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Listing"
@@ -798,7 +794,7 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 		var admindata models.ListAdmin
 		err = cursor.Decode(&admindata)
 		if err != nil {
-			var response models.ListAdminResponse
+			var response dto.ListAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Listing"
@@ -828,7 +824,7 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 
 	}
 
-	response := models.ListAdminResponse{
+	response := dto.ListAdminResponse{
 		Status:     "SUCCESS",
 		StatusCode: "200",
 		Message:    "Listed Successfully",
@@ -851,10 +847,10 @@ func ListAdmin(input models.ListAdminRequest) models.ListAdminResponse {
 }
 
 // Delete Admin
-func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
+func DeleteAdmin(input dto.DeleteAdminRequest) dto.DeleteAdminResponse {
 
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 || !IsValidEmail(input.Email) || len(input.Reason) < 10 {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -874,7 +870,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 	}
 
 	if input.Email == constants.AdminEmail {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "You can not Delete Super Admin"
@@ -895,7 +891,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 
 	id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
 	if err != nil {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -916,7 +912,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 
 		return response
 	}
-	var admin models.AdminData
+	var admin models.Admin
 	filter := bson.M{"adminid": id}
 	projection := bson.M{
 		"_id":           0,
@@ -929,7 +925,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 	option := options.FindOne().SetProjection(projection)
 	err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&admin)
 	if err != nil {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error in Deleting"
@@ -954,7 +950,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 		return response
 	}
 	if admin.Email == input.Email {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "You can not Delete YourSelf"
@@ -973,7 +969,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 		return response
 	}
 	if admin.IsBlocked {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Your ID has been Blocked"
@@ -998,7 +994,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 		return response
 	}
 	if !admin.CanAlterAdmin {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -1018,11 +1014,11 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 
 		return response
 	}
-	var deletingadmin models.AdminData
+	var deletingadmin models.Admin
 	filter = bson.M{"email": input.Email}
 	err = config.Admin_Collection.FindOne(context.Background(), filter).Decode(&deletingadmin)
 	if err != nil {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Email not found"
@@ -1042,7 +1038,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 
 		return response
 	}
-	var deleteAdminDb models.DeleteAdmin
+	var deleteAdminDb models.DeletedAdmin
 	deleteAdminDb.DeleteID = GenerateUniqueDeleteID()
 	deleteAdminDb.DeletedTime = time.Now()
 	deleteAdminDb.Deleteddata = deletingadmin
@@ -1052,7 +1048,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 	deleteAdminDb.Reason = input.Reason
 	_, err = config.AdminDeleted_Collection.InsertOne(context.Background(), deleteAdminDb)
 	if err != nil {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error in Deleting"
@@ -1079,7 +1075,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 
 	_, err = config.Admin_Collection.DeleteOne(context.Background(), filter)
 	if err != nil {
-		var response models.DeleteAdminResponse
+		var response dto.DeleteAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error in Deleting"
@@ -1104,7 +1100,7 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 		return response
 	}
 
-	var response models.DeleteAdminResponse
+	var response dto.DeleteAdminResponse
 	response.StatusCode = "200"
 	response.Status = "SUCCESS"
 	response.Message = "Admin Deleted Successfully"
@@ -1124,9 +1120,9 @@ func DeleteAdmin(input models.DeleteAdminRequest) models.DeleteAdminResponse {
 }
 
 // Edit Admin
-func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
+func EditAdmin(input dto.EditAdminRequest) dto.EditAdminResponse {
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 || !IsValidEmail(input.Email) || len(input.Reason) < 10 || len(input.UpdateFeild) < 1 || input.UpdateValue == "" {
-		var response models.EditAdminResponse
+		var response dto.EditAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -1148,7 +1144,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 	if input.UpdateFeild == "adminname" || input.UpdateFeild == "ip" || input.UpdateFeild == "wronginput" || input.UpdateFeild == "candelete" || input.UpdateFeild == "canupdate" || input.UpdateFeild == "canalteradmin" {
 
 		if input.Email == constants.AdminEmail {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "You can not Edit Super Admin"
@@ -1169,7 +1165,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 
 		id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
 		if err != nil {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Login Expired"
@@ -1190,7 +1186,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 
 			return response
 		}
-		var admin models.AdminData
+		var admin models.Admin
 		filter := bson.M{"adminid": id}
 		projection := bson.M{
 			"_id":           0,
@@ -1203,7 +1199,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 		option := options.FindOne().SetProjection(projection)
 		err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&admin)
 		if err != nil {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error in Editing"
@@ -1228,7 +1224,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 			return response
 		}
 		if admin.Email == input.Email {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "You can not Edit YourSelf"
@@ -1247,7 +1243,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 			return response
 		}
 		if admin.IsBlocked {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Your ID has been Blocked"
@@ -1272,7 +1268,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 			return response
 		}
 		if !admin.CanAlterAdmin {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Access Denied"
@@ -1292,7 +1288,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 
 			return response
 		}
-		var editingadmin models.AdminData
+		var editingadmin models.Admin
 		filter = bson.M{"email": input.Email}
 		projection = bson.M{
 			"_id":             0,
@@ -1305,7 +1301,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 		option = options.FindOne().SetProjection(projection)
 		err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&editingadmin)
 		if err != nil {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Email not found"
@@ -1325,7 +1321,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 
 			return response
 		}
-		editdata := models.EditAdmin{
+		editdata := models.EditedAdmin{
 			EditID:           GenerateUniqueEditID(),
 			EditedByName:     admin.AdminName,
 			EditedById:       admin.AdminID,
@@ -1352,7 +1348,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 		}
 		_, err = config.AdminEdited_Collection.InsertOne(context.Background(), editdata)
 		if err != nil {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error in Editing"
@@ -1382,7 +1378,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 		options := options.Update()
 		_, err = config.Admin_Collection.UpdateOne(context.Background(), filter, update, options)
 		if err != nil {
-			var response models.EditAdminResponse
+			var response dto.EditAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error in Editing"
@@ -1407,7 +1403,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 			filter = bson.M{"editid": editdata.EditID}
 			_, err = config.AdminEdited_Collection.DeleteOne(context.Background(), editdata)
 			if err != nil {
-				var response models.EditAdminResponse
+				var response dto.EditAdminResponse
 				response.StatusCode = "200"
 				response.Status = "FAILED"
 				response.Message = "Error in Editing"
@@ -1432,7 +1428,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 			}
 			return response
 		}
-		var response models.EditAdminResponse
+		var response dto.EditAdminResponse
 		response.StatusCode = "200"
 		response.Status = "SUCCESS"
 		response.Message = "Edited Successfully"
@@ -1451,7 +1447,7 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 
 		return response
 	} else {
-		var response models.EditAdminResponse
+		var response dto.EditAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Not allowed to update " + input.UpdateFeild
@@ -1472,9 +1468,9 @@ func EditAdmin(input models.EditAdminRequest) models.EditAdminResponse {
 }
 
 // View Admin
-func ViewAdmin(input models.ViewAdminRequest) models.ViewAdminResponse {
+func ViewAdmin(input dto.ViewAdminRequest) dto.ViewAdminResponse {
 	if !IsValidEmail(input.AdminEmail) || len(input.Token) < 20 || len(input.PublicKey) < 30 {
-		var response models.ViewAdminResponse
+		var response dto.ViewAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -1495,7 +1491,7 @@ func ViewAdmin(input models.ViewAdminRequest) models.ViewAdminResponse {
 
 	id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
 	if err != nil {
-		var response models.ViewAdminResponse
+		var response dto.ViewAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -1516,7 +1512,7 @@ func ViewAdmin(input models.ViewAdminRequest) models.ViewAdminResponse {
 
 		return response
 	}
-	var admin models.AdminData
+	var admin models.Admin
 	filter := bson.M{"adminid": id}
 	projection := bson.M{
 		"_id":           0,
@@ -1529,7 +1525,7 @@ func ViewAdmin(input models.ViewAdminRequest) models.ViewAdminResponse {
 	option := options.FindOne().SetProjection(projection)
 	err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&admin)
 	if err != nil {
-		var response models.ViewAdminResponse
+		var response dto.ViewAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error in Viewing"
@@ -1555,7 +1551,7 @@ func ViewAdmin(input models.ViewAdminRequest) models.ViewAdminResponse {
 	}
 
 	if admin.IsBlocked {
-		var response models.ViewAdminResponse
+		var response dto.ViewAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Your ID has been Blocked"
@@ -1580,7 +1576,7 @@ func ViewAdmin(input models.ViewAdminRequest) models.ViewAdminResponse {
 		return response
 	}
 	if !admin.CanAlterAdmin {
-		var response models.ViewAdminResponse
+		var response dto.ViewAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -1600,11 +1596,11 @@ func ViewAdmin(input models.ViewAdminRequest) models.ViewAdminResponse {
 
 		return response
 	}
-	var response models.ViewAdminResponse
+	var response dto.ViewAdminResponse
 	filter = bson.M{"email": input.AdminEmail}
 	err = config.Admin_Collection.FindOne(context.Background(), filter).Decode(&response)
 	if err != nil {
-		var response models.ViewAdminResponse
+		var response dto.ViewAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "No Admin found with that email"
@@ -1642,9 +1638,9 @@ func ViewAdmin(input models.ViewAdminRequest) models.ViewAdminResponse {
 }
 
 // Block or Unblock Admin
-func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.BlockorUnblockAdminResponse {
+func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnblockAdminResponse {
 	if !IsValidEmail(input.Email) || len(input.Token) < 20 || len(input.PublicKey) < 30 || !(input.BlockorUnblock == "BLOCK" || input.BlockorUnblock == "UNBLOCK") {
-		var response models.BlockorUnblockAdminResponse
+		var response dto.BlockorUnblockAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -1663,7 +1659,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		return response
 	}
 	if input.Email == constants.AdminEmail {
-		var response models.BlockorUnblockAdminResponse
+		var response dto.BlockorUnblockAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "You can not Block Super Admin"
@@ -1684,7 +1680,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 
 	id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
 	if err != nil {
-		var response models.BlockorUnblockAdminResponse
+		var response dto.BlockorUnblockAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -1705,7 +1701,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 
 		return response
 	}
-	var admin models.AdminData
+	var admin models.Admin
 	filter := bson.M{"adminid": id}
 	projection := bson.M{
 		"_id":           0,
@@ -1718,7 +1714,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 	option := options.FindOne().SetProjection(projection)
 	err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&admin)
 	if err != nil {
-		var response models.BlockorUnblockAdminResponse
+		var response dto.BlockorUnblockAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error in Editing"
@@ -1743,7 +1739,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		return response
 	}
 	if admin.Email == input.Email {
-		var response models.BlockorUnblockAdminResponse
+		var response dto.BlockorUnblockAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "You can not Block YourSelf"
@@ -1762,7 +1758,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		return response
 	}
 	if admin.IsBlocked {
-		var response models.BlockorUnblockAdminResponse
+		var response dto.BlockorUnblockAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Your ID has been Blocked"
@@ -1787,7 +1783,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		return response
 	}
 	if !admin.CanAlterAdmin {
-		var response models.BlockorUnblockAdminResponse
+		var response dto.BlockorUnblockAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -1807,7 +1803,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 
 		return response
 	}
-	var blockingadmin models.AdminData
+	var blockingadmin models.Admin
 	filter = bson.M{"email": input.Email}
 	projection = bson.M{
 		"_id":           0,
@@ -1820,7 +1816,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 	option = options.FindOne().SetProjection(projection)
 	err = config.Admin_Collection.FindOne(context.Background(), filter, option).Decode(&blockingadmin)
 	if err != nil {
-		var response models.BlockorUnblockAdminResponse
+		var response dto.BlockorUnblockAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "No Admin found with that email"
@@ -1857,7 +1853,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		}
 		_, err = config.AdminBlocked_Collection.InsertOne(context.Background(), blockData)
 		if err != nil {
-			var response models.BlockorUnblockAdminResponse
+			var response dto.BlockorUnblockAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while UnBlocking"
@@ -1888,7 +1884,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		options := options.Update()
 		_, err = config.Admin_Collection.UpdateOne(context.Background(), filter, update, options)
 		if err != nil {
-			var response models.BlockorUnblockAdminResponse
+			var response dto.BlockorUnblockAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while UnBlocking"
@@ -1938,7 +1934,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 			}
 			return response
 		}
-		response := models.BlockorUnblockAdminResponse{
+		response := dto.BlockorUnblockAdminResponse{
 			Status:                 "SUCCESS",
 			StatusCode:             "200",
 			Message:                "ADMIN " + input.BlockorUnblock + " SUCCESSFULL",
@@ -1975,7 +1971,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		}
 		_, err = config.AdminBlocked_Collection.InsertOne(context.Background(), blockData)
 		if err != nil {
-			var response models.BlockorUnblockAdminResponse
+			var response dto.BlockorUnblockAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Blocking"
@@ -2006,7 +2002,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		options := options.Update()
 		_, err = config.Admin_Collection.UpdateOne(context.Background(), filter, update, options)
 		if err != nil {
-			var response models.BlockorUnblockAdminResponse
+			var response dto.BlockorUnblockAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Blocking"
@@ -2056,7 +2052,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 			}
 			return response
 		}
-		response := models.BlockorUnblockAdminResponse{
+		response := dto.BlockorUnblockAdminResponse{
 			Status:                 "SUCCESS",
 			StatusCode:             "200",
 			Message:                "ADMIN " + input.BlockorUnblock + " SUCCESSFULL",
@@ -2076,7 +2072,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		go AdminAudit(audit)
 		return response
 	} else if blockingadmin.IsBlocked && input.BlockorUnblock == "BLOCK" {
-		response := models.BlockorUnblockAdminResponse{
+		response := dto.BlockorUnblockAdminResponse{
 			Status:                 "FAILED",
 			StatusCode:             "200",
 			Message:                "Admin is already blocked",
@@ -2097,7 +2093,7 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 		go AdminAudit(audit)
 		return response
 	} else {
-		response := models.BlockorUnblockAdminResponse{
+		response := dto.BlockorUnblockAdminResponse{
 			Status:                 "FAILED",
 			StatusCode:             "200",
 			Message:                "Admin is already Unblocked",
@@ -2122,9 +2118,9 @@ func BlockorUnblockAdmin(input models.BlockorUnblockAdminRequest) models.Blockor
 }
 
 // List Admin Audit
-func ListAdminAudit(input models.ListAdminAuditRequest) models.ListAdminAuditResponse {
+func ListAdminAudit(input dto.ListAdminAuditRequest) dto.ListAdminAuditResponse {
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 {
-		var response models.ListAdminAuditResponse
+		var response dto.ListAdminAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -2144,7 +2140,7 @@ func ListAdminAudit(input models.ListAdminAuditRequest) models.ListAdminAuditRes
 	}
 	email, err := ExtractID(input.Token, []byte(input.PublicKey), "email", constants.AdminTokenKey)
 	if err != nil {
-		var response models.ListAdminAuditResponse
+		var response dto.ListAdminAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -2166,7 +2162,7 @@ func ListAdminAudit(input models.ListAdminAuditRequest) models.ListAdminAuditRes
 		return response
 	}
 	if email != constants.AdminEmail {
-		var response models.ListAdminAuditResponse
+		var response dto.ListAdminAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -2216,7 +2212,7 @@ func ListAdminAudit(input models.ListAdminAuditRequest) models.ListAdminAuditRes
 	var listaudit []models.AdminAudit
 	cursor, err := config.AdminAudit_Collection.Find(context.Background(), query, findOptions)
 	if err != nil {
-		var response models.ListAdminAuditResponse
+		var response dto.ListAdminAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Processing"
@@ -2247,7 +2243,7 @@ func ListAdminAudit(input models.ListAdminAuditRequest) models.ListAdminAuditRes
 		var singleaudit models.AdminAudit
 		err = cursor.Decode(&singleaudit)
 		if err != nil {
-			var response models.ListAdminAuditResponse
+			var response dto.ListAdminAuditResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Processing"
@@ -2273,7 +2269,7 @@ func ListAdminAudit(input models.ListAdminAuditRequest) models.ListAdminAuditRes
 
 	}
 
-	response := models.ListAdminAuditResponse{
+	response := dto.ListAdminAuditResponse{
 		Status:     "SUCCESS",
 		StatusCode: "200",
 		Message:    "List Successfull",
@@ -2296,9 +2292,9 @@ func ListAdminAudit(input models.ListAdminAuditRequest) models.ListAdminAuditRes
 }
 
 // List Developer Audit
-func ListDeveloperAudit(input models.ListDeveloperAuditRequest) models.ListDeveloperAuditResponse {
+func ListDeveloperAudit(input dto.ListDeveloperAuditRequest) dto.ListDeveloperAuditResponse {
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 {
-		var response models.ListDeveloperAuditResponse
+		var response dto.ListDeveloperAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -2318,7 +2314,7 @@ func ListDeveloperAudit(input models.ListDeveloperAuditRequest) models.ListDevel
 	}
 	email, err := ExtractID(input.Token, []byte(input.PublicKey), "email", constants.AdminTokenKey)
 	if err != nil {
-		var response models.ListDeveloperAuditResponse
+		var response dto.ListDeveloperAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -2340,7 +2336,7 @@ func ListDeveloperAudit(input models.ListDeveloperAuditRequest) models.ListDevel
 		return response
 	}
 	if email != constants.AdminEmail {
-		var response models.ListDeveloperAuditResponse
+		var response dto.ListDeveloperAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -2390,7 +2386,7 @@ func ListDeveloperAudit(input models.ListDeveloperAuditRequest) models.ListDevel
 	var listaudit []models.DeveloperAudit
 	cursor, err := config.DeveloperAudit_Collection.Find(context.Background(), query, findOptions)
 	if err != nil {
-		var response models.ListDeveloperAuditResponse
+		var response dto.ListDeveloperAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Processing"
@@ -2421,7 +2417,7 @@ func ListDeveloperAudit(input models.ListDeveloperAuditRequest) models.ListDevel
 		var singleaudit models.DeveloperAudit
 		err = cursor.Decode(&singleaudit)
 		if err != nil {
-			var response models.ListDeveloperAuditResponse
+			var response dto.ListDeveloperAuditResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Processing"
@@ -2447,7 +2443,7 @@ func ListDeveloperAudit(input models.ListDeveloperAuditRequest) models.ListDevel
 
 	}
 
-	response := models.ListDeveloperAuditResponse{
+	response := dto.ListDeveloperAuditResponse{
 		Status:     "SUCCESS",
 		StatusCode: "200",
 		Message:    "List Successfull",
@@ -2470,9 +2466,9 @@ func ListDeveloperAudit(input models.ListDeveloperAuditRequest) models.ListDevel
 }
 
 // List Edited Admin
-func ListEditedAdmin(input models.ListEditedAdminRequest) models.ListEditedAdminResponse {
+func ListEditedAdmin(input dto.ListEditedAdminRequest) dto.ListEditedAdminResponse {
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 {
-		var response models.ListEditedAdminResponse
+		var response dto.ListEditedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -2492,7 +2488,7 @@ func ListEditedAdmin(input models.ListEditedAdminRequest) models.ListEditedAdmin
 	}
 	email, err := ExtractID(input.Token, []byte(input.PublicKey), "email", constants.AdminTokenKey)
 	if err != nil {
-		var response models.ListEditedAdminResponse
+		var response dto.ListEditedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -2514,7 +2510,7 @@ func ListEditedAdmin(input models.ListEditedAdminRequest) models.ListEditedAdmin
 		return response
 	}
 	if email != constants.AdminEmail {
-		var response models.ListEditedAdminResponse
+		var response dto.ListEditedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -2561,10 +2557,10 @@ func ListEditedAdmin(input models.ListEditedAdminRequest) models.ListEditedAdmin
 	if input.NoofData == 0 {
 		input.NoofData = 10
 	}
-	var listaudit []models.EditAdmin
+	var listaudit []models.EditedAdmin
 	cursor, err := config.AdminEdited_Collection.Find(context.Background(), query, findOptions)
 	if err != nil {
-		var response models.ListEditedAdminResponse
+		var response dto.ListEditedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Processing"
@@ -2592,10 +2588,10 @@ func ListEditedAdmin(input models.ListEditedAdminRequest) models.ListEditedAdmin
 			break
 		}
 		input.NoofData--
-		var singleaudit models.EditAdmin
+		var singleaudit models.EditedAdmin
 		err = cursor.Decode(&singleaudit)
 		if err != nil {
-			var response models.ListEditedAdminResponse
+			var response dto.ListEditedAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Processing"
@@ -2621,7 +2617,7 @@ func ListEditedAdmin(input models.ListEditedAdminRequest) models.ListEditedAdmin
 
 	}
 
-	response := models.ListEditedAdminResponse{
+	response := dto.ListEditedAdminResponse{
 		Status:     "SUCCESS",
 		StatusCode: "200",
 		Message:    "List Successfull",
@@ -2644,9 +2640,9 @@ func ListEditedAdmin(input models.ListEditedAdminRequest) models.ListEditedAdmin
 }
 
 // List Deleted Admin
-func ListDeletedAdmin(input models.ListDeletedAdminRequest) models.ListDeletedAdminResponse {
+func ListDeletedAdmin(input dto.ListDeletedAdminRequest) dto.ListDeletedAdminResponse {
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 {
-		var response models.ListDeletedAdminResponse
+		var response dto.ListDeletedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -2666,7 +2662,7 @@ func ListDeletedAdmin(input models.ListDeletedAdminRequest) models.ListDeletedAd
 	}
 	email, err := ExtractID(input.Token, []byte(input.PublicKey), "email", constants.AdminTokenKey)
 	if err != nil {
-		var response models.ListDeletedAdminResponse
+		var response dto.ListDeletedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -2688,7 +2684,7 @@ func ListDeletedAdmin(input models.ListDeletedAdminRequest) models.ListDeletedAd
 		return response
 	}
 	if email != constants.AdminEmail {
-		var response models.ListDeletedAdminResponse
+		var response dto.ListDeletedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -2735,10 +2731,10 @@ func ListDeletedAdmin(input models.ListDeletedAdminRequest) models.ListDeletedAd
 	if input.NoofData == 0 {
 		input.NoofData = 10
 	}
-	var listaudit []models.DeleteAdmin
+	var listaudit []models.DeletedAdmin
 	cursor, err := config.AdminDeleted_Collection.Find(context.Background(), query, findOptions)
 	if err != nil {
-		var response models.ListDeletedAdminResponse
+		var response dto.ListDeletedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Processing"
@@ -2766,10 +2762,10 @@ func ListDeletedAdmin(input models.ListDeletedAdminRequest) models.ListDeletedAd
 			break
 		}
 		input.NoofData--
-		var singleaudit models.DeleteAdmin
+		var singleaudit models.DeletedAdmin
 		err = cursor.Decode(&singleaudit)
 		if err != nil {
-			var response models.ListDeletedAdminResponse
+			var response dto.ListDeletedAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Processing"
@@ -2795,7 +2791,7 @@ func ListDeletedAdmin(input models.ListDeletedAdminRequest) models.ListDeletedAd
 
 	}
 
-	response := models.ListDeletedAdminResponse{
+	response := dto.ListDeletedAdminResponse{
 		Status:     "SUCCESS",
 		StatusCode: "200",
 		Message:    "List Successfull",
@@ -2818,9 +2814,9 @@ func ListDeletedAdmin(input models.ListDeletedAdminRequest) models.ListDeletedAd
 }
 
 // List Blocked Admin
-func ListBlockedAdmin(input models.ListBlockedAdminRequest) models.ListBlockedAdminResponse {
+func ListBlockedAdmin(input dto.ListBlockedAdminRequest) dto.ListBlockedAdminResponse {
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 {
-		var response models.ListBlockedAdminResponse
+		var response dto.ListBlockedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -2840,7 +2836,7 @@ func ListBlockedAdmin(input models.ListBlockedAdminRequest) models.ListBlockedAd
 	}
 	email, err := ExtractID(input.Token, []byte(input.PublicKey), "email", constants.AdminTokenKey)
 	if err != nil {
-		var response models.ListBlockedAdminResponse
+		var response dto.ListBlockedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Login Expired"
@@ -2862,7 +2858,7 @@ func ListBlockedAdmin(input models.ListBlockedAdminRequest) models.ListBlockedAd
 		return response
 	}
 	if email != constants.AdminEmail {
-		var response models.ListBlockedAdminResponse
+		var response dto.ListBlockedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Access Denied"
@@ -2912,7 +2908,7 @@ func ListBlockedAdmin(input models.ListBlockedAdminRequest) models.ListBlockedAd
 	var listaudit []models.BlockorUnblockAdmin
 	cursor, err := config.AdminBlocked_Collection.Find(context.Background(), query, findOptions)
 	if err != nil {
-		var response models.ListBlockedAdminResponse
+		var response dto.ListBlockedAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Error while Processing"
@@ -2943,7 +2939,7 @@ func ListBlockedAdmin(input models.ListBlockedAdminRequest) models.ListBlockedAd
 		var singleaudit models.BlockorUnblockAdmin
 		err = cursor.Decode(&singleaudit)
 		if err != nil {
-			var response models.ListBlockedAdminResponse
+			var response dto.ListBlockedAdminResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
 			response.Message = "Error while Processing"
@@ -2969,7 +2965,7 @@ func ListBlockedAdmin(input models.ListBlockedAdminRequest) models.ListBlockedAd
 
 	}
 
-	response := models.ListBlockedAdminResponse{
+	response := dto.ListBlockedAdminResponse{
 		Status:     "SUCCESS",
 		StatusCode: "200",
 		Message:    "List Successfull",
@@ -2992,9 +2988,9 @@ func ListBlockedAdmin(input models.ListBlockedAdminRequest) models.ListBlockedAd
 }
 
 // Validate Admin Token
-func ValidateAdminToken(input models.ValidateAdminTokenRequest) models.ValidateAdminTokenResponse {
+func ValidateAdminToken(input dto.ValidateAdminTokenRequest) dto.ValidateAdminTokenResponse {
 	if len(input.PublicKey) < 30 && len(input.Token) < 20 {
-		var response models.ValidateAdminTokenResponse
+		var response dto.ValidateAdminTokenResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "Wrong Input Data"
@@ -3016,7 +3012,7 @@ func ValidateAdminToken(input models.ValidateAdminTokenRequest) models.ValidateA
 
 	id, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
 	if err != nil {
-		var response models.ValidateAdminTokenResponse
+		var response dto.ValidateAdminTokenResponse
 		response.StatusCode = "200"
 		response.Status = "SUCCESS"
 		response.Message = "TOKEN HAS BEEN EXPIRED"
@@ -3037,7 +3033,7 @@ func ValidateAdminToken(input models.ValidateAdminTokenRequest) models.ValidateA
 		go AdminAudit(audit)
 		return response
 	}
-	var response models.ValidateAdminTokenResponse
+	var response dto.ValidateAdminTokenResponse
 	response.StatusCode = "200"
 	response.Status = "SUCCESS"
 	response.Message = "TOKEN IS VALID"

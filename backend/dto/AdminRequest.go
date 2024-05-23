@@ -130,3 +130,24 @@ type ListDeveloperAuditRequest struct {
 	SortOrder   int       `json:"sortorder,omitempty" bson:"sortorder,omitempty"`
 }
 
+// List Edited Admin Request
+type ListEditedAdminRequest struct {
+	Token       string    `json:"token" bson:"token"`
+	PublicKey   string    `json:"publickey" bson:"publickey"`
+	NoofData    int64     `json:"noofdata" bson:"noofdata"`
+	SortBy      string    `json:"sortby,omitempty" bson:"sortby,omitempty"`
+	FromDate    time.Time `json:"fromdate,omitempty" bson:"fromdate,omitempty"`
+	ToDate      time.Time `json:"todate,omitempty" bson:"todate,omitempty"`
+	SearchBY    string    `json:"searchby,omitempty" bson:"searchby,omitempty"`
+	SearchValue string    `json:"searchvalue,omitempty" bson:"searchvalue,omitempty"`
+	SortOrder   int       `json:"sortorder,omitempty" bson:"sortorder,omitempty"`
+}
+
+
+// Validate Admin Token Request
+type ValidateAdminTokenRequest struct {
+	Token     string `json:"token" bson:"token"`
+	PublicKey string `json:"publickey" bson:"publickey"`
+}
+
+

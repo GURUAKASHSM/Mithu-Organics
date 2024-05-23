@@ -113,6 +113,6 @@ const (
 	AdminEdited_Collection       = "EDITED_ADMIN"
 	UserEdited_Collection        = "EDITED_USER"
 	OrderEdited_Collection       = "EDITED_ORDER"
-	AdminBlocked_Collection      = "BLOCKED_ADMIN"
-	UserBlocked_Collection       = "BLOCKED_USER"
+	AdminBlocked_Collection      = "BLOCKED/UNBLOCKED_ADMIN"
+	UserBlocked_Collection       = "BLOCKED/UNBLOCKED_USER"
 )

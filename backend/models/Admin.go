@@ -4,10 +4,8 @@ import (
 	"time"
 )
 
-
-
 // EditAdmin DB
-type EditAdmin struct {
+type EditedAdmin struct {
 	EditID           string      `json:"editid" bson:"editid"`
 	EditedByName     string      `json:"editedbyname" bson:"editedbyname"`
 	EditedById       string      `json:"editedbyid" bson:"editedbyid"`
@@ -21,14 +19,10 @@ type EditAdmin struct {
 	EditTime         time.Time   `json:"edittime" bson:"edittime"`
 }
 
-
-
-
-
 // Delete Admin DB
-type DeleteAdmin struct {
+type DeletedAdmin struct {
 	DeleteID     string    `json:"deleteid" bson:"deleteid"`
-	Deleteddata  AdminData `json:"deleteddata" bson:"deleteddata"`
+	Deleteddata  Admin     `json:"deleteddata" bson:"deleteddata"`
 	DeleterID    string    `json:"deleterid" bson:"deleterid"`
 	DeleterName  string    `json:"deletername" bson:"deletername"`
 	DeleterEmail string    `json:"deleteremail" bson:"deleteremail"`
@@ -36,9 +30,8 @@ type DeleteAdmin struct {
 	DeletedTime  time.Time `json:"deletedtime" bson:"deletedtime"`
 }
 
-
 // Admin Signup Data
-type AdminData struct {
+type Admin struct {
 	AdminName     string    `json:"adminname" bson:"adminname"`
 	AdminID       string    `json:"adminid" bson:"adminid"`
 	Email         string    `json:"email" bson:"email"`
@@ -58,12 +51,6 @@ type AdminData struct {
 	Token         string    `json:"token" bson:"token"`
 }
 
-
-
-
-
-
-
 // Block Admin DB
 type BlockorUnblockAdmin struct {
 	BlockID                      string    `json:"blockid" bson:"blockid" `
@@ -77,32 +64,6 @@ type BlockorUnblockAdmin struct {
 	Reason                       string    `json:"reason" bson:"reason"`
 	BlockedorUnblockedTime       time.Time `json:"blockedtime" bson:"blockedtime"`
 }
-
-
-
-// To Delete Data
-type Delete struct {
-	Collection string `json:"collection" bson:"collection"`
-	IdValue    string `json:"idValue" bson:"idValue"`
-}
-
-// To Upadte Feild
-type Update struct {
-	Collection string `json:"collection" bson:"collection"`
-	IdName     string `json:"email" bson:"email"`
-	Field      string `json:"field" bson:"field"`
-	New_Value  string `json:"newvalue" bson:"newvalue"`
-}
-
-// Admin Signup Data
-type AdminTokenData struct {
-	AdminID string `json:"adminid" bson:"adminid"`
-	Email   string `json:"email" bson:"email"`
-}
-
-
-
-
 
 // Admin Sign in data
 type AdminAudit struct {
@@ -134,45 +95,7 @@ type ListAdmin struct {
 	IsBlocked     bool      `json:"isblocked" bson:"isblocked"`
 }
 
-
-// List Edited Admin Request
-type ListEditedAdminRequest struct {
-	Token       string    `json:"token" bson:"token"`
-	PublicKey   string    `json:"publickey" bson:"publickey"`
-	NoofData    int64     `json:"noofdata" bson:"noofdata"`
-	SortBy      string    `json:"sortby,omitempty" bson:"sortby,omitempty"`
-	FromDate    time.Time `json:"fromdate,omitempty" bson:"fromdate,omitempty"`
-	ToDate      time.Time `json:"todate,omitempty" bson:"todate,omitempty"`
-	SearchBY    string    `json:"searchby,omitempty" bson:"searchby,omitempty"`
-	SearchValue string    `json:"searchvalue,omitempty" bson:"searchvalue,omitempty"`
-	SortOrder   int       `json:"sortorder,omitempty" bson:"sortorder,omitempty"`
-}
-
-// List Edited Admin Response
-type ListEditedAdminResponse struct {
-	Status     string      `bson:"status" json:"status"`
-	StatusCode string      `bson:"statuscode" json:"statuscode"`
-	Message    string      `bson:"message" json:"message"`
-	Error      error       `bson:"error,omitempty" json:"error,omitempty"`
-	Listedtime time.Time   `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
-	Data       []EditAdmin `bson:"data,omitempty" json:"data,omitempty"`
-}
-
-// Validate Admin Token Request
-type ValidateAdminTokenRequest struct {
-	Token     string `json:"token" bson:"token"`
-	PublicKey string `json:"publickey" bson:"publickey"`
-}
-
-// Validate Admin Token Response
-type ValidateAdminTokenResponse struct {
-	Status       string    `bson:"status" json:"status"`
-	StatusCode   string    `bson:"statuscode" json:"statuscode"`
-	Message      string    `bson:"message" json:"message"`
-	Error        error     `bson:"error,omitempty" json:"error,omitempty"`
-	Responsetime time.Time `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
-	Valid        bool      `json:"valid" bson:"vaild"`
-}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Data Needed for Admin Page
 type AdminPageData struct {
