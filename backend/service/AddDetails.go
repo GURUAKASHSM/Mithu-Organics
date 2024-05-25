@@ -20,7 +20,7 @@ func AddDefaultAdmin() {
 		AdminName:     constants.AdminName,
 		AdminID:       GenerateUniqueAdminID(),
 		Email:         constants.AdminEmail,
-		Password:       HashAdminPassword(constants.Password),
+		Password:      HashAdminPassword(constants.Password),
 		IP_Address:    constants.IP,
 		WrongInput:    0,
 		LoginTime:     time.Time{},
@@ -31,6 +31,7 @@ func AddDefaultAdmin() {
 		CreatedBy:     "DEFAULT",
 		IsBlocked:     false,
 		Token:         "NIL",
+		IsApproved:    true,
 	}
 
 	pvt, pub, err := GenerateRSAKeyPair()
@@ -126,7 +127,7 @@ func AddDefaultAdmin() {
 			audit.ServiceName = "Admin"
 			audit.Status = 200
 			audit.StatusMessage = "FAILED"
-			
+
 			go AdminAudit(audit)
 			var dev models.DeveloperAudit
 			dev.Audit = audit

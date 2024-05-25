@@ -19,6 +19,7 @@ import (
 
 // Admin Login
 func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
+	log.Println( !IsValidEmail(login.Email) , len(login.Password) <= 5 , !IsValidIP(login.IP_Address) , !IsValidTOTP(login.TOTP))
 	if !IsValidEmail(login.Email) || len(login.Password) <= 5 || !IsValidIP(login.IP_Address) || !IsValidTOTP(login.TOTP) {
 		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
@@ -99,6 +100,27 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 		audit.APIName = "AdminLogin"
 		audit.AdminID = correctdata.AdminID
 		audit.Message = "MAXIMUM NO OF TRY REACHED"
+		login.Password = ""
+		audit.Payload = login
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	if !correctdata.IsApproved{
+		var response dto.AdminLoginResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "You are not approved yet"
+		response.LoginTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "AdminLogin"
+		audit.AdminID = correctdata.AdminID
+		audit.Message = "ADMIN IS NOT APPROVED YET BUT TRIED TO LOGIN BY " + login.Email 
 		login.Password = ""
 		audit.Payload = login
 		audit.ServiceName = "Admin"
@@ -222,6 +244,10 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 	response.AdminName = correctdata.AdminName
 	response.PublicKey = correctdata.PublicKey
 	response.Token = token
+	response.Email  = correctdata.Email
+	response.CanDelete = correctdata.CanDeleteData
+	response.CanAlterAdmin  = correctdata.CanAlterAdmin
+	response.CanUpdate = correctdata.CanUpdateData
 	response.LoginTime = time.Now()
 
 	update := bson.M{
@@ -440,6 +466,7 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		CreatedBy:     fromAdmin.AdminID,
 		IsBlocked:     false,
 		Token:         "",
+		IsApproved: false,
 	}
 	pvt, pub, err := GenerateRSAKeyPair()
 	if err != nil {
@@ -3039,7 +3066,7 @@ func ValidateAdminToken(input dto.ValidateAdminTokenRequest) dto.ValidateAdminTo
 	response.Message = "TOKEN IS VALID"
 	response.Responsetime = time.Now()
 	response.Valid = true
-	response.Error = err
+
 
 	var audit models.AdminAudit
 	audit.APIName = "ValidateAdminToken"
