@@ -146,3 +146,12 @@ type ValidateAdminTokenResponse struct {
 	Responsetime time.Time `bson:"listedtime,omitempty" json:"listedtime,omitempty"`
 	Valid        bool      `json:"valid" bson:"vaild"`
 }
+
+// Approve Admin Response
+type ApproveAdminResponse struct {
+	Status       string    `bson:"status,omitempty" json:"status,omitempty"`
+	StatusCode   string    `bson:"statuscode,omitempty" json:"statuscode,omitempty"`
+	Message      string    `bson:"message,omitempty" json:"message,omitempty"`
+	Error        error     `bson:"error,omitempty" json:"error,omitempty"`
+	ApprovedTime time.Time `bson:"approvedtime,omitempty" json:"approvedtime,omitempty"`
+}

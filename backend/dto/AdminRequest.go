@@ -150,4 +150,11 @@ type ValidateAdminTokenRequest struct {
 	PublicKey string `json:"publickey" bson:"publickey"`
 }
 
+// Approve Admin Request
+type ApproveAdminRequest struct{
+	Token     string `json:"token" bson:"token"`
+	PublicKey string `json:"publickey" bson:"publickey"`
+	AdminEmail string `json:"adminemail" bson:"adminemail"`
+}
+
 

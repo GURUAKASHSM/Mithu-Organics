@@ -5,13 +5,9 @@ import (
 	"log"
 	"mithuorganics/config"
 	"mithuorganics/constants"
-
 	dto "mithuorganics/dto"
 	"mithuorganics/models"
-
-
 	"time"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -467,6 +463,9 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		IsBlocked:     false,
 		Token:         "",
 		IsApproved: false,
+	}
+	if fromAdmin.Email == constants.AdminEmail{
+		admindata.IsApproved = true
 	}
 	pvt, pub, err := GenerateRSAKeyPair()
 	if err != nil {
@@ -3016,7 +3015,7 @@ func ListBlockedAdmin(input dto.ListBlockedAdminRequest) dto.ListBlockedAdminRes
 
 // Validate Admin Token
 func ValidateAdminToken(input dto.ValidateAdminTokenRequest) dto.ValidateAdminTokenResponse {
-	if len(input.PublicKey) < 30 && len(input.Token) < 20 {
+	if len(input.PublicKey) < 30 || len(input.Token) < 20 {
 		var response dto.ValidateAdminTokenResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
@@ -3079,6 +3078,166 @@ func ValidateAdminToken(input dto.ValidateAdminTokenRequest) dto.ValidateAdminTo
 	audit.StatusMessage = "SUCCESS"
 
 	go AdminAudit(audit)
+	return response
+}
+
+// Approve Admin 
+func ApproveAdmin(input dto.ApproveAdminRequest)dto.ApproveAdminResponse{
+	if len(input.PublicKey) < 30 || len(input.Token) < 20 || !IsValidEmail(input.AdminEmail) {
+		var response dto.ApproveAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Wrong Input Data"
+		response.ApprovedTime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ApproveAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "INVALID INPUT"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	email, err := ExtractID(input.Token, []byte(input.PublicKey), "email", constants.AdminTokenKey)
+	if err != nil {
+		var response dto.ApproveAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "LOGIN EXPIRED"
+		response.ApprovedTime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ApproveAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "LOGIN EXPIRED"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.Error = err
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	if email != constants.AdminEmail{
+		var response dto.ApproveAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ACCESS DENIED"
+		response.ApprovedTime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ApproveAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "NOT A SUPER ADMIN BUT TRY TO APPROVE ADMIN DONE BY: "+email
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.Error = err
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+	filter := bson.M{"email":input.AdminEmail}
+	var admin models.Admin
+	err = config.Admin_Collection.FindOne(context.Background(),filter).Decode(&admin)
+	if err != nil{
+		var response dto.ApproveAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ADMIN WITH THE GIVEN EMAIL NOT FOUND"
+		response.ApprovedTime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ApproveAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "ADMIN WITH THE GIVEN EMAIL NOT FOUND DONE BY: "+email
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.Error = err
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	if admin.IsApproved{
+		var response dto.ApproveAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ADMIN ALREADY APPROVED"
+		response.ApprovedTime = time.Now()
+	
+
+		var audit models.AdminAudit
+		audit.APIName = "ApproveAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "ADMIN ALREADY APPROVED DONE BY: "+email
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+	update := bson.M{"$set": bson.M{"isapproved": true}}
+	_,err = config.Admin_Collection.UpdateOne(context.Background(),filter,update)
+	if err != nil{
+		var response dto.ApproveAdminResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "APPROVAL FAILED"
+		response.ApprovedTime = time.Now()
+		response.Error = err
+	
+
+		var audit models.AdminAudit
+		audit.APIName = "ApproveAdmin"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "PROBLEM IN UPDATEING IN ADMIN COLLECTION DONE BY:"+email
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+		audit.Error = err
+
+		var dev models.DeveloperAudit
+        dev.Audit = audit
+		dev.Message = "ERROR IN UPDATEING IN ADMIN COLLECTION"
+
+		
+        go DeveloperAudit(dev)
+		go AdminAudit(audit)
+		return response
+	}
+	var response dto.ApproveAdminResponse
+	response.StatusCode = "200"
+	response.Status = "SUCCESS"
+	response.Message = "ADMIN APPROVED"
+	response.ApprovedTime = time.Now()
+
+
+	var audit models.AdminAudit
+	audit.APIName = "ApproveAdmin"
+	audit.AdminID = email
+	audit.Message = "ADMIN "+input.AdminEmail+" APPROVED SUCCESSFULLY DONE BY:"+email
+	audit.Payload = input
+	audit.ServiceName = "Admin"
+	audit.Status = 200
+	audit.StatusMessage = "SUCCESS"
+    
 	return response
 }
 
