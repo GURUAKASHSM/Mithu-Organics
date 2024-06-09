@@ -1,7 +1,7 @@
 package controller
 
 import (
-	//"log"
+	"log"
 	dto "mithuorganics/dto"
 	"mithuorganics/service"
 	"net/http"
@@ -45,6 +45,7 @@ func CreateAdmin(c *gin.Context) {
 func ListAdmin(c *gin.Context) {
 	var admin dto.ListAdminRequest
 	if err := c.BindJSON(&admin); err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
 		return
 	}
@@ -205,6 +206,23 @@ func ValidateAdminToken(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"result": result})
 }
+
+
+// Approve Admin
+func ApproveAdmin(c *gin.Context) {
+	var admin dto.ApproveAdminRequest
+	if err := c.BindJSON(&admin); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+		return
+	}
+	result := service.ApproveAdmin(admin)
+	if result.Status == "FAILED" {
+		c.JSON(http.StatusOK, gin.H{"error": result})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"result": result})
+}
+
 
 // // Get all Inventory Data
 // func Getinventorydata(c *gin.Context) {

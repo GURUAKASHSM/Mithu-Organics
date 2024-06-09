@@ -1,4 +1,3 @@
-
 function Login(event) {
     event.preventDefault();
     // Create a JSON object from the form data
@@ -41,7 +40,17 @@ function Login(event) {
                 showToast(data.result.message, "Success", 3);
 
                 setTimeout(() => {
-                    const jsonString = JSON.stringify(data.result);
+                    
+                    const admindata = {
+                        email:data.result.email,
+                        adminname:data.result.adminname,
+                        publickey:data.result.publickey,
+                        token:data.result.token,
+                        canupdate:data.result.canupdate,
+                        candelete:data.result.candelete,
+                        canalteradmin:data.result.canalteradmin,
+                    }
+                    const jsonString = JSON.stringify(admindata);
                     localStorage.setItem('admindata', jsonString);
 
                     window.location.href = `/admin/dashboard`;
@@ -131,7 +140,7 @@ function showToast(str, war, no) {
 
 
 function DisplayToast() {
-    showToast("Please contact your service provider for deatils", "Info", 1)
+    showToast("Please contact Super admin for deatils", "Info", 1)
 }
 
 function validateEmail(email) {

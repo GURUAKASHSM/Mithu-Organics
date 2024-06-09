@@ -1,3 +1,26 @@
+function HideAll(){
+    document.getElementById("shutdown-form-container").style.display = 'none';
+    document.getElementById('employee-wrapper').style.display = 'none';
+    document.querySelector('.container-p-y').style.display = 'none';
+    document.getElementById("notapprovedseller").style.display = 'none';
+    document.getElementById('single-order-container').style.display = 'none';
+    document.querySelector('.outer-container').style.display = 'none';
+    document.getElementById("clearbuttons-container").style.display = 'none';
+    document.getElementById('sellersnip').style.display = 'none';
+    document.getElementById('feedbacksnip').style.display = 'none';
+    document.getElementById("clear-form-container").style.display = 'none'
+    document.getElementById('Inventorysnip').style.display = 'none';
+    document.querySelector('.wrapper').style.display = 'none';
+    document.getElementById('admin-wrapper').style.display = 'none';
+    document.getElementById("orders-container").style.display = 'none';
+    document.getElementById("block-form-container").style.display = 'none';
+    document.getElementById('update-form-admin-container').style.display = 'none';
+    document.getElementById('snippetContent').style.display = 'none';
+    document.querySelector('.display-view').style.display = 'none';
+    document.getElementById("calendar").style.display = 'none';
+    document.getElementById("event-wrapper").style.display = 'none';
+    document.getElementById('workersnip').style.display = 'none';
+}
 var adminData = localStorage.getItem('admindata');
 if (adminData) {
     // Parse the JSON string to convert it into a JavaScript object
@@ -1177,82 +1200,6 @@ function DisplayFeedBacks() {
 }
 
 
-function DisplayAllWorkers() {
-    console.log("Displaylist")
-    document.getElementById("shutdown-form-container").style.display = 'none';
-    document.getElementById('employee-wrapper').style.display = 'none';
-    document.querySelector('.container-p-y').style.display = 'none';
-    document.getElementById("notapprovedseller").style.display = 'none';
-    document.getElementById('single-order-container').style.display = 'none';
-    document.querySelector('.outer-container').style.display = 'none';
-    document.getElementById("clearbuttons-container").style.display = 'none';
-    document.getElementById('sellersnip').style.display = 'none';
-    document.getElementById('feedbacksnip').style.display = 'none';
-    document.getElementById("clear-form-container").style.display = 'none'
-    document.getElementById('Inventorysnip').style.display = 'none';
-    document.querySelector('.wrapper').style.display = 'none';
-    document.getElementById('admin-wrapper').style.display = 'none';
-    document.getElementById("orders-container").style.display = 'none';
-    document.getElementById("block-form-container").style.display = 'none';
-    document.getElementById('update-form-admin-container').style.display = 'none';
-    document.getElementById('snippetContent').style.display = 'none';
-    document.querySelector('.display-view').style.display = 'none';
-    document.getElementById("calendar").style.display = 'none';
-    document.getElementById("event-wrapper").style.display = 'none';
-    document.getElementById('workersnip').style.display = 'block';
-    fetch("http://localhost:8080/getworkers", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-    })
-        .then(response => response.json())
-        .then(data => {
-            let html = ""
-            console.log(data.result)
-            data.result.forEach(worker => {
-
-                html += `
-
-            <tr class="candidates-list">
-            <td class="title">
-              <div class="thumb"> <img class="img-fluid"
-                  src="data:image/jpeg;base64,${worker.image}" alt="">
-              </div>
-              <div class="candidate-list-details">
-                <div class="candidate-list-info">
-                  <div class="candidate-list-title customer">
-                    <h5 class="mb-0"><a href="#">${worker.username.toUpperCase()}</a></h5>
-                  </div>
-                  <div class="candidate-list-option">
-                    <ul class="list-unstyled">
-                      <li><i class="fas fa-filter pr-1"></i>${worker.email}</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td class="candidate-list-favourite-time text-center"> <a
-                class="candidate-list-favourite order-2 text-danger" href="#"></a>
-              <span class="candidate-list-time order-1">${worker.no}</span></td>
-            <td>
-              <ul class="list-unstyled mb-0 d-flex justify-content-end">
-               <li  onclick="ViewData('${worker.email}','worker');recentPage = 'worker';"><a class="text-danger" data-toggle="tooltip" title=""
-              data-original-title="Delete"><i class="far fa-eye"></i></a></li>
-                <li  onclick="deleteWorker('${worker.email}');DisplayAllWorkers();recentPage = 'worker';"><a class="text-danger" data-toggle="tooltip" title=""
-                data-original-title="Delete"><i class="far fa-trash-alt"></i></a></li>
-              </ul>
-            </td>
-          </tr>`;
-
-            });
-            document.querySelector('.worker-list-body').innerHTML = html;
-        })
-        .catch(error => {
-            showToast(error, "Error", 0);
-        });
-}
 
 
 function ViewData(id, profession) {
@@ -2063,29 +2010,7 @@ function ClearDB(collection) {
         });
 }
 
-// Display Conformation
 
-function showConfirmation(function_name, question, option1, option2, id) {
-    console.log("In Conformation")
-    document.getElementById("conformationoverlay").classList.add("conformationactive");
-    document.getElementById("confirmationDialog").classList.add("conformationactive");
-    document.querySelector(".conformation-question").innerHTML = question;
-    document.getElementById("conformationtrue").innerHTML = option1;
-    document.getElementById("confirmationfalse").innerHTML = option2;
-
-    document.getElementById("conformationtrue").addEventListener("click", function () {
-        function_name(id);
-        hideConfirmationDialog();
-    });
-    document.getElementById("confirmationfalse").addEventListener("click", function () {
-        hideConfirmationDialog();
-    });
-}
-
-function hideConfirmationDialog() {
-    document.getElementById("conformationoverlay").classList.remove("conformationactive");
-    document.getElementById("confirmationDialog").classList.remove("conformationactive");
-}
 
 function Displayallnotapprovedseller() {
     document.getElementById("shutdown-form-container").style.display = 'none';
@@ -2581,4 +2506,159 @@ async function DeleteOrder(id) {
 }
 
 
+function showConfirmation(function_name, question, option1, option2, id,value) {
+    console.log("In Conformation")
+    document.getElementById("conformationoverlay").classList.add("conformationactive");
+    document.getElementById("confirmationDialog").classList.add("conformationactive");
+    document.querySelector(".conformation-question").innerHTML = question;
+    document.getElementById("conformationtrue").innerHTML = option1;
+    document.getElementById("confirmationfalse").innerHTML = option2;
 
+    document.getElementById("conformationtrue").addEventListener("click", function () {
+        function_name(id,value);
+        hideConfirmationDialog();
+    });
+    document.getElementById("confirmationfalse").addEventListener("click", function () {
+        hideConfirmationDialog();
+    });
+}
+
+function hideConfirmationDialog() {
+    document.getElementById("conformationoverlay").classList.remove("conformationactive");
+    document.getElementById("confirmationDialog").classList.remove("conformationactive");
+}
+
+
+function displayObjectInPopup(objStr) {
+    const obj = JSON.parse(decodeURIComponent(objStr));
+  
+    // Disable scrolling and interactions on the body
+    document.body.classList.add('popup-open');
+  
+    // Create an overlay to darken the background
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    document.body.appendChild(overlay);
+  
+    // Create the popup container
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+  
+    // Create a preformatted text element to display the object
+    const pre = document.createElement('pre');
+    pre.textContent = JSON.stringify(obj, null, 2);
+  
+    // Create a close button
+    const closeButton = document.createElement('div');
+    closeButton.className = 'close-button';
+    closeButton.innerHTML = '&times;';
+    closeButton.onclick = () => {
+      document.body.removeChild(popup);
+      document.body.removeChild(overlay);
+      document.body.classList.remove('popup-open');
+    };
+  
+    // Append the preformatted text and close button to the popup
+    popup.appendChild(closeButton);
+    popup.appendChild(pre);
+  
+    // Append the popup to the body
+    document.body.appendChild(popup);
+  }
+
+  function openCustomPopup(message, onSubmit) {
+    // Create overlay to disable other functionalities
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.zIndex = '9999';
+    document.body.appendChild(overlay);
+
+    // Create popup container
+    const popupContainer = document.createElement('div');
+    popupContainer.style.position = 'fixed';
+    popupContainer.style.top = '50%';
+    popupContainer.style.left = '50%';
+    popupContainer.style.transform = 'translate(-50%, -50%)';
+    popupContainer.style.backgroundColor = '#fff';
+    popupContainer.style.padding = '20px';
+    popupContainer.style.zIndex = '10000';
+    popupContainer.style.textAlign = 'center';
+    popupContainer.style.borderRadius = '10px';
+    popupContainer.style.border = '2px solid #000';
+    popupContainer.innerHTML = `
+        <h4>${message}</h4>
+        <br>
+        <textarea id="popupInput" style="margin-bottom: 10px; width: 100%; padding: 5px; border-radius: 5px; border: 1px solid #ccc; height:100px" placeholder="Reason Here .."></textarea>
+        <br>
+        <br>
+        <div style="display:flex;justify-content: space-between;">
+            <button id="cancelButton" style="background-color: #ff6347; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">Cancel</button>
+            <button id="submitButton" style="background-color: #32CD32; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+        </div>
+        <p id="errorMessage" style="color: red; display: none;">Please enter something</p>
+    `;
+    document.body.appendChild(popupContainer);
+
+    // Disable scroll
+    document.body.style.overflow = 'hidden';
+
+    // Disable click on overlay
+    overlay.addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+
+    // Function to handle cancel button click
+    const cancelHandler = function() {
+        document.body.removeChild(overlay);
+        document.body.removeChild(popupContainer);
+        document.body.style.overflow = 'auto'; // Enable scroll back
+        document.getElementById('cancelButton').removeEventListener('click', cancelHandler);
+        document.getElementById('submitButton').removeEventListener('click', submitHandler);
+        onSubmit(''); // Return empty string
+    };
+    document.getElementById('cancelButton').addEventListener('click', cancelHandler);
+
+    // Function to handle submit button click
+    const submitHandler = function() {
+        const inputValue = document.getElementById('popupInput').value;
+        if (inputValue.trim() === '') {
+            document.getElementById('errorMessage').style.display = 'block';
+        } else {
+            onSubmit(inputValue);
+            document.body.removeChild(overlay);
+            document.body.removeChild(popupContainer);
+            document.body.style.overflow = 'auto'; // Enable scroll back
+            document.getElementById('cancelButton').removeEventListener('click', cancelHandler);
+            document.getElementById('submitButton').removeEventListener('click', submitHandler);
+        }
+    };
+    document.getElementById('submitButton').addEventListener('click', submitHandler);
+
+    // Add hover effect to buttons
+    const cancelButton = document.getElementById('cancelButton');
+    const submitButton = document.getElementById('submitButton');
+    cancelButton.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#ff8c79';
+    });
+
+    cancelButton.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#ff6347';
+    });
+
+    submitButton.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#3cb371';
+    });
+
+    submitButton.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#32CD32';
+    });
+}
+
+
+
+  

@@ -606,6 +606,7 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 
 // List Admin
 func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
+	log.Println(len(input.Token) < 20 , len(input.PublicKey))
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 || (input.SearchBY == "" && input.SearchValue != "") || (input.SearchValue == "" && input.SearchBY != "") {
 		var response dto.ListAdminResponse
 		response.StatusCode = "200"
@@ -763,6 +764,12 @@ func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
 		query = append(query, bson.E{Key: "canalteradmin", Value: true})
 	} else if input.CanAlterAdmin == "FALSE" {
 		query = append(query, bson.E{Key: "canalteradmin", Value: false})
+	}
+
+	if input.IsApproved == "TRUE" {
+		query = append(query, bson.E{Key: "isapproved", Value: true})
+	} else if input.IsApproved == "FALSE" {
+		query = append(query, bson.E{Key: "isapproved", Value: false})
 	}
 
 	if input.SearchBY != "" && input.SearchValue != "" {

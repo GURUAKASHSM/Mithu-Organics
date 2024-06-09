@@ -110,6 +110,112 @@
       }
     }
 
+    /* The switch - the box around the slider */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 30px;
+      height: 17px;
+
+    }
+    body.popup-open {
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #000;
+    font-weight: bold;
+    pointer-events: auto; /* Allow interactions on the close button */
+  }
+
+  .popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background-color: white;
+    padding: 40px;
+    border: 2px solid #000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+    font-size: 1.5em;
+    pointer-events: auto; /* Allow interactions inside the popup */
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+  }
+
+
+    /* Hide default HTML checkbox */
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    /* The slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 13px;
+      width: 13px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked+.slider {
+      background-color: #2196F3;
+    }
+
+    input:focus+.slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+      -webkit-transform: translateX(13px);
+      -ms-transform: translateX(13px);
+      transform: translateX(13px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 12px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
     #calendar {
       max-width: 800px;
       margin: 0 auto;
@@ -1535,7 +1641,8 @@
   <link rel="stylesheet" href="./assets/css/demo.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
   <!-- Vendors CSS -->
   <link rel="stylesheet" href="./assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
   <link rel="stylesheet" href="./assets/vendor/libs/apex-charts/apex-charts.css" />
@@ -1590,7 +1697,7 @@
                 </svg>
               </span>
             </span>
-            <span class="app-brand-text demo menu-text fw-semibold ms-2">Anon</span>
+            <span class="app-brand-text demo menu-text fw-semibold ms-2">Mithu Organics</span>
           </a>
 
           <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -1651,16 +1758,9 @@
 
           </li>
           <li class="menu-item">
-            <a onclick="DisplayListSeller();" class="menu-link">
-              <i class="menu-icon tf-icons mdi mdi-account-tag-outline"></i>
-              <div data-i18n="Authentications" style="cursor: pointer;">Seller</div>
-            </a>
-
-          </li>
-          <li class="menu-item">
-            <a onclick="DisplayAllWorkers()" class="menu-link">
+            <a onclick="DisplayAllAdmin()" class="menu-link">
               <i class="menu-icon tf-icons mdi mdi-account-hard-hat-outline"></i>
-              <div data-i18n="Misc" style="cursor: pointer;">Workers</div>
+              <div data-i18n="Misc" style="cursor: pointer;">Admin</div>
             </a>
 
           </li>
@@ -2235,29 +2335,133 @@
             </div>
           </div>
           <!--Worker-->
-          <div id="workersnip" style="display: none;">
+          <div id="workersnip" style="display: none;margin-left: 9%;">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
               integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous">
             <div class="container mt-3 mb-4">
+
               <div class="col-lg-9 mt-4 mt-lg-0">
+
                 <div class="row">
+
                   <div class="col-md-12">
+
                     <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
+                      <div class="filter" style="background-color: #d6e6eab0;padding:  5%;border-radius: 5px;">
+                        <div class="date" style="display: flex;justify-content: space-between;padding-bottom: 2%;">
+                          <div class="fromdate">
+                            <label>From : </label>
+                            <input type="date" id="listadmin-fromdate">
+                          </div>
+                          <div class="todate">
+                            <label>To : </label>
+                            <input type="date" id="listadmin-todate">
+                          </div>
+                          <div style="display: flex;">
+                            <div class="order-by ">
+                              <label>Order By:</label>
+                              <select id="listadmin-orderby">
+                                <option value="adminname">Name</option>
+                                <option value="email">Email</option>
+                                <option value="logintime">Login time</option>
+                              </select>
+                            </div>
+                            <div class="order-value ">
+                              <select id="listadmin-ordervalue">
+                                <option value="1">Ascending</option>
+                                <option value="-1">Decending</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="search" style="display: flex;">
+                          <div class="searchby">
+                            <label>Search By:</label>
+                            <select id="listadmin-searchby">
+                              <option value="adminid">Admin ID</option>
+                              <option value="email">Email</option>
+                              <optio value="adminname">Name</option>
+                                <option value="createdby">Created By</option>
+                            </select>
+                          </div>
+                          <div class="searchvalue" style="padding-left: 8%;">
+                            <input id="listadmin-searchvalue" type="text" placeholder="Search Value 🔍"
+                              style="width: 200%;height: 30px;border-radius: 5px;">
+                          </div>
+                        </div>
+                        <div class="booleanvalue" style="display: flex;justify-content: space-between;padding-top:2%">
+                          <div class="approved">
+                            <label>Is Approved:</label>
+                            <label class="switch">
+                              <input type="checkbox" id="listadmin-isapproved">
+                              <span class="slider round"></span>
+                            </label>
+                          </div>
+                          <div class="blocked">
+                            <label>Is Blocked:</label>
+                            <label class="switch">
+                              <input type="checkbox" id="listadmin-isblocked">
+                              <span class="slider round"></span>
+                            </label>
+                          </div>
+
+                          <div class="update">
+                            <label>Can Update:</label>
+                            <label class="switch">
+                              <input type="checkbox" id="listadmin-canupdate">
+                              <span class="slider round"></span>
+                            </label>
+                          </div>
+
+                          <div class="delete">
+                            <label>Can Delete:</label>
+                            <label class="switch">
+                              <input type="checkbox" id="listadmin-candelete">
+                              <span class="slider round"></span>
+                            </label>
+                          </div>
+
+                          <div class="changeadmin">
+                            <label>Can Change Admin:</label>
+                            <label class="switch">
+                              <input type="checkbox" id="listadmin-canalteradmin">
+                              <span class="slider round"></span>
+                            </label>
+                          </div>
+
+                        </div>
+
+                        <div style="display: flex;justify-content: space-between;padding-top: 2%;padding-bottom: 2%;">
+                          <button style="width: 30%;border-radius: 5%;color: #000;" onclick="DefaultListAdminSet()">Reset</button>
+                          <button style="width: 30%;border-radius: 5%;color: #000;" onclick="DisplayAllAdmin()">Modify 🔍</button>
+                        </div>
+                      </div>
                       <table class="table manage-candidates-top mb-0">
                         <thead>
                           <tr>
                             <th>Name</th>
-                            <th class="text-center">Mobile No</th>
+                            <th class="text-center">Email</th>
                             <th class="action text-right">Action</th>
                           </tr>
                         </thead>
                         <tbody class="worker-list-body">
 
                         </tbody>
-                      </table>
 
+                      </table>
+                      <div style="display: flex;justify-content: right;padding-top:2%">
+                        <div style="padding-right: 2%;" id="noofitems">2 of 2</div>
+                        <select id="listadmin-pagenation" onchange="DisplayAllAdmin()">
+                          <option>10</option>
+                          <option>30</option>
+                          <option>50</option>
+                          <option>70</option>
+                          <option>100</option>
+                        </select>
+
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2937,6 +3141,12 @@
   <script src="vendor/countdowntime/countdowntime.js"></script>
   <!--===============================================================================================-->
   <script src="js/main.js"></script>
+  <script src="scripts/ListAdmin.js"></script>
+  <script src="scripts/DeleteAdmin.js"></script>
+  <script src="scripts/BlockORUnblockAdmin.js"></script>
+  <script src="scripts/ApproveAdmin.js"></script>
+
+
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>

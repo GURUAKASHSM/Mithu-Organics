@@ -19,11 +19,12 @@ type ListAdminRequest struct {
 	FromDate      time.Time `json:"fromdate,omitempty" bson:"fromdate,omitempty"`
 	ToDate        time.Time `json:"todate,omitempty" bson:"todate,omitempty"`
 	SearchBY      string    `json:"searchby,omitempty" bson:"searchby,omitempty"`
+	IsApproved     string    `json:"isapproved,omitempty" bson:"isapproved,omitempty"`
 	SearchValue   string    `json:"searchvalue,omitempty" bson:"searchvalue,omitempty"`
 	IsBlocked     string    `json:"isblocked,omitempty" bson:"isblocked,omitempty"`
 	CanUpdate     string    `json:"canupdate,omitempty" bson:"canupdate,omitempty"`
 	CanDelete     string    `json:"candelete,omitempty" bson:"candelete,omitempty"`
-	CanAlterAdmin string    `json:"canalteradmin" bson:"canalteradmin"`
+	CanAlterAdmin string    `json:"canalteradmin,omitempty" bson:"canalteradmin,omitempty"`
 	SortOrder     int       `json:"sortorder,omitempty" bson:"sortorder,omitempty"`
 }
 

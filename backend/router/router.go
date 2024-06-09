@@ -66,7 +66,7 @@ func Router() *gin.Engine {
 	router.POST("/listdeletedadmin", controller.ListDeletedAdmin)
 	router.POST("/listeditted", controller.ListEditedAdmin)
 	router.POST("/listblockedadmin", controller.ListBlockedAdmin)
-
+	router.POST("/approveadmin", controller.ApproveAdmin)
 
 	// router.POST("/adminpage", controller.GetAllDetailsForAdmin)
 	// router.POST("/getworkers", controller.GetWorkers)

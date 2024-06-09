@@ -94,6 +94,7 @@ type ListAdmin struct {
 	CanAlterAdmin bool      `json:"canalteradmin" bson:"canalteradmin"`
 	CreatedBy     string    `json:"createdby" bson:"createdby"`
 	IsBlocked     bool      `json:"isblocked" bson:"isblocked"`
+	IsApproved    bool      `json:"isapproved,omitempty" bson:"isapproved,omitempty"`
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
