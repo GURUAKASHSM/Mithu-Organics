@@ -70,7 +70,6 @@ type BlockorUnblockAdmin struct {
 type AdminAudit struct {
 	AuditID       string      `bson:"auditid" json:"auditid"`
 	AdminID       string      `bson:"adminid,omitempty" json:"adminid,omitempty"`
-	Error         error       `bson:"error,omitempty" json:"error,omitempty"`
 	Message       string      `bson:"message" json:"message"`
 	AuditTime     time.Time   `bson:"audittime" json:"audittime"`
 	ServiceName   string      `bson:"servicename" json:"servicename"`
@@ -79,6 +78,7 @@ type AdminAudit struct {
 	Status        int         `bson:"status" json:"status"`
 	StatusMessage string      `bson:"statusmessage" json:"statusmessage"`
 }
+
 
 // List Admin
 type ListAdmin struct {

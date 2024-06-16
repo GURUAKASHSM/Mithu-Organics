@@ -155,3 +155,23 @@ type ApproveAdminResponse struct {
 	Error        error     `bson:"error,omitempty" json:"error,omitempty"`
 	ApprovedTime time.Time `bson:"approvedtime,omitempty" json:"approvedtime,omitempty"`
 }
+
+
+// Reset Gauth Response
+type ResetGauthResponse struct {
+	Status       string    `bson:"status,omitempty" json:"status,omitempty"`
+	StatusCode   string    `bson:"statuscode,omitempty" json:"statuscode,omitempty"`
+	Message      string    `bson:"message,omitempty" json:"message,omitempty"`
+	Error        error     `bson:"error,omitempty" json:"error,omitempty"`
+	Resetedtime time.Time `bson:"resetedtime,omitempty" json:"resetedtime,omitempty"`
+}
+
+// Reset Password Response
+type ResetPasswordResponse struct {
+	Status       string    `bson:"status,omitempty" json:"status,omitempty"`
+	StatusCode   string    `bson:"statuscode,omitempty" json:"statuscode,omitempty"`
+	Message      string    `bson:"message,omitempty" json:"message,omitempty"`
+	Error        error     `bson:"error,omitempty" json:"error,omitempty"`
+	Resetedtime time.Time `bson:"resetedtime,omitempty" json:"resetedtime,omitempty"`
+}
+

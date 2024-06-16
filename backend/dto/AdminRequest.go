@@ -19,7 +19,7 @@ type ListAdminRequest struct {
 	FromDate      time.Time `json:"fromdate,omitempty" bson:"fromdate,omitempty"`
 	ToDate        time.Time `json:"todate,omitempty" bson:"todate,omitempty"`
 	SearchBY      string    `json:"searchby,omitempty" bson:"searchby,omitempty"`
-	IsApproved     string    `json:"isapproved,omitempty" bson:"isapproved,omitempty"`
+	IsApproved    string    `json:"isapproved,omitempty" bson:"isapproved,omitempty"`
 	SearchValue   string    `json:"searchvalue,omitempty" bson:"searchvalue,omitempty"`
 	IsBlocked     string    `json:"isblocked,omitempty" bson:"isblocked,omitempty"`
 	CanUpdate     string    `json:"canupdate,omitempty" bson:"canupdate,omitempty"`
@@ -60,14 +60,11 @@ type CreateAdminRequest struct {
 	FromAdminPublicKey string `json:"formadminpublickey" bson:"formadminpublickey"`
 	AdminName          string `json:"name,omitempty" bson:"name,omitempty"`
 	Email              string `bson:"email,omitempty" json:"email,omitempty"`
-	Password           string `bson:"password,omitempty" json:"password,omitempty"`
-	ConfirmPassword    string `bson:"confirmpassword,omitempty" json:"confirmpassword,omitempty"`
 	IP_Address         string `bson:"ip,omitempty" json:"ip,omitempty"`
 	CanDeleteData      bool   `json:"candelete,omitempty" bson:"candelete,omitempty"`
 	CanUpdateData      bool   `json:"canupdate,omitempty" bson:"canupdate,omitempty"`
 	CanAlterAdmin      bool   `json:"canalteradmin,omitempty" bson:"canalteradmin,omitempty"`
 }
-
 
 // List Deleted Admin Request
 type ListDeletedAdminRequest struct {
@@ -103,7 +100,6 @@ type AdminLoginRequest struct {
 	TOTP       string `json:"totp,omitempty" bson:"totp,omitempty"`
 }
 
-
 // ListAdmin Audit Request
 type ListAdminAuditRequest struct {
 	Token       string    `json:"token" bson:"token"`
@@ -115,8 +111,8 @@ type ListAdminAuditRequest struct {
 	SearchBY    string    `json:"searchby,omitempty" bson:"searchby,omitempty"`
 	SearchValue string    `json:"searchvalue,omitempty" bson:"searchvalue,omitempty"`
 	SortOrder   int       `json:"sortorder,omitempty" bson:"sortorder,omitempty"`
+	Status      string    `json:"status,omitempty" bson:"status,omitempty"`
 }
-
 
 // ListDeveloper Audit Request
 type ListDeveloperAuditRequest struct {
@@ -144,7 +140,6 @@ type ListEditedAdminRequest struct {
 	SortOrder   int       `json:"sortorder,omitempty" bson:"sortorder,omitempty"`
 }
 
-
 // Validate Admin Token Request
 type ValidateAdminTokenRequest struct {
 	Token     string `json:"token" bson:"token"`
@@ -152,10 +147,24 @@ type ValidateAdminTokenRequest struct {
 }
 
 // Approve Admin Request
-type ApproveAdminRequest struct{
-	Token     string `json:"token" bson:"token"`
-	PublicKey string `json:"publickey" bson:"publickey"`
+type ApproveAdminRequest struct {
+	Token      string `json:"token" bson:"token"`
+	PublicKey  string `json:"publickey" bson:"publickey"`
 	AdminEmail string `json:"adminemail" bson:"adminemail"`
 }
 
+// Reset Password Request
+type ResetPasswordRequest struct {
+	Reason     string `json:"reason,omitempty" bson:"reason,omitempty"`
+	Token      string `json:"token" bson:"token"`
+	PublicKey  string `json:"publickey" bson:"publickey"`
+	AdminEmail string `json:"adminemail" bson:"adminemail"`
+}
 
+// Reset Gauth Request
+type ResetGauthRequest struct {
+	Reason     string `json:"reason,omitempty" bson:"reason,omitempty"`
+	Token      string `json:"token" bson:"token"`
+	PublicKey  string `json:"publickey" bson:"publickey"`
+	AdminEmail string `json:"adminemail" bson:"adminemail"`
+}

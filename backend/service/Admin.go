@@ -8,14 +8,14 @@ import (
 	dto "mithuorganics/dto"
 	"mithuorganics/models"
 	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
 )
 
 // Admin Login
 func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
-	log.Println( !IsValidEmail(login.Email) , len(login.Password) <= 5 , !IsValidIP(login.IP_Address) , !IsValidTOTP(login.TOTP))
+	log.Println(!IsValidEmail(login.Email), len(login.Password) <= 5, !IsValidIP(login.IP_Address), !IsValidTOTP(login.TOTP))
 	if !IsValidEmail(login.Email) || len(login.Password) <= 5 || !IsValidIP(login.IP_Address) || !IsValidTOTP(login.TOTP) {
 		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
@@ -52,7 +52,7 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 		var audit models.AdminAudit
 		audit.APIName = "AdminLogin"
 		audit.AdminID = "NOT FOUND"
-		audit.Error = err
+		
 		audit.Message = "ADMIN EMAIL NOT FOUND BUT TRIED TO LOGIN"
 		login.Password = ""
 		audit.Payload = login
@@ -106,7 +106,7 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 		return response
 	}
 
-	if !correctdata.IsApproved{
+	if !correctdata.IsApproved {
 		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
@@ -116,7 +116,7 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 		var audit models.AdminAudit
 		audit.APIName = "AdminLogin"
 		audit.AdminID = correctdata.AdminID
-		audit.Message = "ADMIN IS NOT APPROVED YET BUT TRIED TO LOGIN BY " + login.Email 
+		audit.Message = "ADMIN IS NOT APPROVED YET BUT TRIED TO LOGIN BY " + login.Email
 		login.Password = ""
 		audit.Payload = login
 		audit.ServiceName = "Admin"
@@ -126,7 +126,7 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 		go AdminAudit(audit)
 		return response
 	}
-	if correctdata.IP_Address != login.IP_Address {
+	if correctdata.IP_Address == login.IP_Address {
 
 		var response dto.AdminLoginResponse
 		response.StatusCode = "200"
@@ -222,7 +222,7 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 		audit.Status = 200
 		audit.StatusMessage = "FAILED"
 
-		audit.Error = err
+		
 
 		var dev models.DeveloperAudit
 		dev.Audit = audit
@@ -240,9 +240,9 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 	response.AdminName = correctdata.AdminName
 	response.PublicKey = correctdata.PublicKey
 	response.Token = token
-	response.Email  = correctdata.Email
+	response.Email = correctdata.Email
 	response.CanDelete = correctdata.CanDeleteData
-	response.CanAlterAdmin  = correctdata.CanAlterAdmin
+	response.CanAlterAdmin = correctdata.CanAlterAdmin
 	response.CanUpdate = correctdata.CanUpdateData
 	response.LoginTime = time.Now()
 
@@ -266,7 +266,7 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 		audit.Status = 200
 		audit.StatusMessage = "FAILED"
 
-		audit.Error = err
+		
 		var dev models.DeveloperAudit
 		dev.Audit = audit
 		dev.Message = "ERROR IN UPDATEING DATA IN ADMIN COLLECTION"
@@ -292,8 +292,8 @@ func AdminLogin(login dto.AdminLoginRequest) dto.AdminLoginResponse {
 
 // Create Admin
 func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
-	log.Println(len(admin.FromAdminToken) < 20, len(admin.FromAdminPublicKey) < 30, len(admin.AdminName) <= 4, !IsValidEmail(admin.Email), !IsValidIP(admin.IP_Address), len(admin.Password) <= 5, len(admin.ConfirmPassword) <= 5, len(admin.Password) != len(admin.ConfirmPassword))
-	if len(admin.FromAdminToken) < 20 || len(admin.FromAdminPublicKey) < 30 || len(admin.AdminName) <= 4 || !IsValidEmail(admin.Email) || !IsValidIP(admin.IP_Address) || len(admin.Password) <= 5 || len(admin.ConfirmPassword) <= 5 || len(admin.Password) != len(admin.ConfirmPassword) {
+	log.Println(len(admin.FromAdminToken) < 20, len(admin.FromAdminPublicKey) < 30, len(admin.AdminName) <= 4, !IsValidEmail(admin.Email), !IsValidIP(admin.IP_Address))
+	if len(admin.FromAdminToken) < 20 || len(admin.FromAdminPublicKey) < 30 || len(admin.AdminName) <= 4 || !IsValidEmail(admin.Email) || !IsValidIP(admin.IP_Address) {
 		var response dto.CreateAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
@@ -304,8 +304,6 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		audit.APIName = "AddAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "INVALID INPUT"
-		admin.Password = ""
-		admin.ConfirmPassword = ""
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -326,8 +324,6 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		audit.APIName = "AddAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		admin.Password = ""
-		admin.ConfirmPassword = ""
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -360,8 +356,7 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		audit.APIName = "AddAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "ERROR IN FINDING ADMIN"
-		admin.Password = ""
-		admin.ConfirmPassword = ""
+
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -386,8 +381,6 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		audit.APIName = "AddAdmin"
 		audit.AdminID = fromAdmin.AdminID
 		audit.Message = "ADMIN ID HAS BEEN BLOCKED BUT TRYIED TO CREATE ADMIN"
-		admin.Password = ""
-		admin.ConfirmPassword = ""
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -414,8 +407,6 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		audit.APIName = "AddAdmin"
 		audit.AdminID = fromAdmin.AdminID
 		audit.Message = "ADMIN DONT HAVE ACCESS TO CREATE , BUT TRY TO CREATE ANOTHER ADMIN"
-		admin.Password = ""
-		admin.ConfirmPassword = ""
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -425,33 +416,14 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 
 		return response
 	}
-	if admin.Password != admin.ConfirmPassword {
-		var response dto.CreateAdminResponse
-		response.StatusCode = "200"
-		response.Status = "FAILED"
-		response.Message = "Password Mismatch"
-		response.CreatingTime = time.Now()
 
-		var audit models.AdminAudit
-		audit.APIName = "AddAdmin"
-		audit.AdminID = "NOT FOUND"
-		audit.Message = "PASSWORD & CONFIRM PASSWORD MISMATCH"
-		admin.Password = ""
-		admin.ConfirmPassword = ""
-		audit.Payload = admin
-		audit.ServiceName = "Admin"
-		audit.Status = 200
-		audit.StatusMessage = "FAILED"
-
-		go AdminAudit(audit)
-		return response
-	}
-
+	password, hashpassword := GenerateHashPassword()
+	log.Println(password)
 	admindata := models.Admin{
 		AdminName:     admin.AdminName,
 		AdminID:       GenerateUniqueAdminID(),
 		Email:         admin.Email,
-		Password:      HashAdminPassword(admin.Password),
+		Password:      hashpassword,
 		IP_Address:    admin.IP_Address,
 		WrongInput:    0,
 		LoginTime:     time.Time{},
@@ -462,9 +434,9 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		CreatedBy:     fromAdmin.AdminID,
 		IsBlocked:     false,
 		Token:         "",
-		IsApproved: false,
+		IsApproved:    false,
 	}
-	if fromAdmin.Email == constants.AdminEmail{
+	if fromAdmin.Email == constants.AdminEmail {
 		admindata.IsApproved = true
 	}
 	pvt, pub, err := GenerateRSAKeyPair()
@@ -479,8 +451,6 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		audit.APIName = "AddAdmin"
 		audit.AdminID = fromAdmin.AdminID
 		audit.Message = "ERROR IN GENERATING PUBLIC & PRIVATE KEY"
-		admin.Password = ""
-		admin.ConfirmPassword = ""
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -508,8 +478,6 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		audit.APIName = "AddAdmin"
 		audit.AdminID = admindata.AdminID
 		audit.Message = "ERROR IN GENERATING TOTP SECERET KEY FOR ADMIIN"
-		admin.Password = ""
-		admin.ConfirmPassword = ""
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -544,7 +512,7 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		fromAdmin.Password = ""
 		audit.APIName = "AddAdmin"
 		audit.AdminID = fromAdmin.AdminID
-		audit.Error = err
+		
 		audit.Message = "ADMIN WITH EMIAL & ADMINID ALREADY EXISTS"
 		audit.Payload = fromAdmin
 		audit.ServiceName = "Admin"
@@ -566,9 +534,8 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 			audit.AdminID = admindata.AdminID
 			audit.AuditID = GenerateUniqueAuditID()
 			audit.AuditTime = time.Now()
-			audit.Error = err
+			
 			audit.Message = "ERROR IN CREATING NEW ADMIN"
-			admin.Password = ""
 			audit.Payload = admin
 			audit.ServiceName = "Admin"
 			audit.Status = 200
@@ -591,14 +558,13 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 		var audit models.AdminAudit
 		audit.APIName = "AddAdmin"
 		audit.AdminID = admindata.AdminID
-		audit.Error = err
+		
 		audit.Message = "ADMIN CREATED SUCCESSFULLY " + fromAdmin.Email
-		admin.Password = ""
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
 		audit.Status = 200
 		audit.StatusMessage = "SUCCESS"
-		//go SendAdminInvitation(admin.Email, admin.AdminName, admin.Password, "https://anon.up.railway.app/admin/", admin.IP, key)
+		//go SendAdminInvitation(admin.Email, admin.AdminName, password, "https://anon.up.railway.app/admin/", admin.IP, key)
 		go AdminAudit(audit)
 		return response
 	}
@@ -606,7 +572,7 @@ func CreateAdmin(admin dto.CreateAdminRequest) dto.CreateAdminResponse {
 
 // List Admin
 func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
-	log.Println(len(input.Token) < 20 , len(input.PublicKey))
+	log.Println(len(input.Token) < 20, len(input.PublicKey))
 	if len(input.Token) < 20 || len(input.PublicKey) < 30 || (input.SearchBY == "" && input.SearchValue != "") || (input.SearchValue == "" && input.SearchBY != "") {
 		var response dto.ListAdminResponse
 		response.StatusCode = "200"
@@ -639,7 +605,7 @@ func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
 		audit.APIName = "ListAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -670,7 +636,7 @@ func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
 		audit.APIName = "ListAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "ERROR WHILE PROCESSING"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -808,7 +774,7 @@ func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
 		audit.Status = 200
 		audit.StatusMessage = "FAILED"
 
-		audit.Error = err
+		
 
 		var dev models.DeveloperAudit
 		dev.Audit = audit
@@ -843,7 +809,7 @@ func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
 			audit.ServiceName = "Admin"
 			audit.Status = 200
 			audit.StatusMessage = "FAILED"
-			audit.Error = err
+			
 
 			var dev models.DeveloperAudit
 			dev.Audit = audit
@@ -873,7 +839,7 @@ func ListAdmin(input dto.ListAdminRequest) dto.ListAdminResponse {
 	audit.ServiceName = "Admin"
 	audit.Status = 200
 	audit.StatusMessage = "SUCCESS"
-	audit.Error = err
+	
 	go AdminAudit(audit)
 
 	return response
@@ -935,7 +901,7 @@ func DeleteAdmin(input dto.DeleteAdminRequest) dto.DeleteAdminResponse {
 		audit.APIName = "DeleteAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -968,7 +934,7 @@ func DeleteAdmin(input dto.DeleteAdminRequest) dto.DeleteAdminResponse {
 		audit.APIName = "DeleteAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "ERROR WHILE PROCESSING"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -1061,7 +1027,7 @@ func DeleteAdmin(input dto.DeleteAdminRequest) dto.DeleteAdminResponse {
 		audit.APIName = "DeleteAdmin"
 		audit.AdminID = id
 		audit.Message = "ERROR ADMIN WITH THE GIVEN EMAIL NOT FOUND"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -1092,7 +1058,7 @@ func DeleteAdmin(input dto.DeleteAdminRequest) dto.DeleteAdminResponse {
 		audit.APIName = "DeleteAdmin"
 		audit.AdminID = id
 		audit.Message = "ERROR WHILE ADDING DATA TO DELETED ADMIN DATABASE"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -1119,7 +1085,7 @@ func DeleteAdmin(input dto.DeleteAdminRequest) dto.DeleteAdminResponse {
 		audit.APIName = "DeleteAdmin"
 		audit.AdminID = id
 		audit.Message = "ERROR WHILE DELETING DATA "
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -1174,7 +1140,7 @@ func EditAdmin(input dto.EditAdminRequest) dto.EditAdminResponse {
 		return response
 	}
 
-	if input.UpdateFeild == "adminname" || input.UpdateFeild == "ip" || input.UpdateFeild == "wronginput" || input.UpdateFeild == "candelete" || input.UpdateFeild == "canupdate" || input.UpdateFeild == "canalteradmin" {
+	if input.UpdateFeild == "adminname" || input.UpdateFeild == "wronginput" || input.UpdateFeild == "candelete" || input.UpdateFeild == "canupdate" || input.UpdateFeild == "canalteradmin" {
 
 		if input.Email == constants.AdminEmail {
 			var response dto.EditAdminResponse
@@ -1209,7 +1175,7 @@ func EditAdmin(input dto.EditAdminRequest) dto.EditAdminResponse {
 			audit.APIName = "EditAdmin"
 			audit.AdminID = "NOT FOUND"
 			audit.Message = "LOGIN EXPIRED"
-			audit.Error = err
+			
 			audit.Payload = input
 			audit.ServiceName = "Admin"
 			audit.Status = 200
@@ -1242,7 +1208,7 @@ func EditAdmin(input dto.EditAdminRequest) dto.EditAdminResponse {
 			audit.APIName = "EditAdmin"
 			audit.AdminID = "NOT FOUND"
 			audit.Message = "ERROR WHILE EDITING"
-			audit.Error = err
+			
 			audit.Payload = input
 			audit.ServiceName = "Admin"
 			audit.Status = 200
@@ -1344,7 +1310,7 @@ func EditAdmin(input dto.EditAdminRequest) dto.EditAdminResponse {
 			audit.APIName = "EditAdmin"
 			audit.AdminID = id
 			audit.Message = "ERROR ADMIN WITH THE GIVEN EMAIL NOT FOUND"
-			audit.Error = err
+			
 			audit.Payload = input
 			audit.ServiceName = "Admin"
 			audit.Status = 200
@@ -1392,7 +1358,7 @@ func EditAdmin(input dto.EditAdminRequest) dto.EditAdminResponse {
 			audit.APIName = "EditAdmin"
 			audit.AdminID = id
 			audit.Message = "ERROR WHILE ADDING DATA TO EDIT ADMIN DATABASE"
-			audit.Error = err
+			
 			audit.Payload = input
 			audit.ServiceName = "Admin"
 			audit.Status = 200
@@ -1422,7 +1388,7 @@ func EditAdmin(input dto.EditAdminRequest) dto.EditAdminResponse {
 			audit.APIName = "EditAdmin"
 			audit.AdminID = id
 			audit.Message = "ERROR WHILE UPDATING DATA"
-			audit.Error = err
+			
 			audit.Payload = input
 			audit.ServiceName = "Admin"
 			audit.Status = 200
@@ -1447,7 +1413,7 @@ func EditAdmin(input dto.EditAdminRequest) dto.EditAdminResponse {
 				audit.APIName = "EditAdmin"
 				audit.AdminID = id
 				audit.Message = "ERROR WHILE DELETING DATA IN EDIT ADMIN DB BECAUSE EDIT FAILED"
-				audit.Error = err
+				
 				audit.Payload = input
 				audit.ServiceName = "Admin"
 				audit.Status = 200
@@ -1535,7 +1501,7 @@ func ViewAdmin(input dto.ViewAdminRequest) dto.ViewAdminResponse {
 		audit.APIName = "ViewAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -1568,7 +1534,7 @@ func ViewAdmin(input dto.ViewAdminRequest) dto.ViewAdminResponse {
 		audit.APIName = "ViewAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "ERROR WHILE VIEWING"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -1666,7 +1632,7 @@ func ViewAdmin(input dto.ViewAdminRequest) dto.ViewAdminResponse {
 	audit.ServiceName = "Admin"
 	audit.Status = 200
 	audit.StatusMessage = "SUCCESS"
-
+    go AdminAudit(audit)
 	return response
 }
 
@@ -1724,7 +1690,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 		audit.APIName = "BlockAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -1757,7 +1723,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 		audit.APIName = "BlockAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "ERROR WHILE EDITING"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -1866,7 +1832,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 		audit.Status = 200
 		audit.StatusMessage = "FAILED"
 
-		audit.Error = err
+		
 
 		go AdminAudit(audit)
 		return response
@@ -1902,7 +1868,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 			audit.Status = 200
 			audit.StatusMessage = "FAILED"
 
-			audit.Error = err
+			
 
 			var dev models.DeveloperAudit
 			dev.Audit = audit
@@ -1933,7 +1899,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 			audit.Status = 200
 			audit.StatusMessage = "FAILED"
 
-			audit.Error = err
+			
 
 			var dev models.DeveloperAudit
 			dev.Audit = audit
@@ -1954,7 +1920,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 				audit.Status = 200
 				audit.StatusMessage = "FAILED"
 
-				audit.Error = err
+				
 
 				var dev models.DeveloperAudit
 				dev.Audit = audit
@@ -2020,7 +1986,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 			audit.Status = 200
 			audit.StatusMessage = "FAILED"
 
-			audit.Error = err
+			
 
 			var dev models.DeveloperAudit
 			dev.Audit = audit
@@ -2051,7 +2017,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 			audit.Status = 200
 			audit.StatusMessage = "FAILED"
 
-			audit.Error = err
+			
 
 			var dev models.DeveloperAudit
 			dev.Audit = audit
@@ -2072,7 +2038,7 @@ func BlockorUnblockAdmin(input dto.BlockorUnblockAdminRequest) dto.BlockorUnbloc
 				audit.Status = 200
 				audit.StatusMessage = "FAILED"
 
-				audit.Error = err
+				
 
 				var dev models.DeveloperAudit
 				dev.Audit = audit
@@ -2184,7 +2150,7 @@ func ListAdminAudit(input dto.ListAdminAuditRequest) dto.ListAdminAuditResponse 
 		audit.APIName = "ListAdminAudit"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -2230,12 +2196,16 @@ func ListAdminAudit(input dto.ListAdminAuditRequest) dto.ListAdminAuditResponse 
 		query = append(query, bson.E{Key: input.SearchBY, Value: input.SearchValue})
 	}
 
+	if input.Status != "" && (input.Status == "SUCCESS" || input.Status == "FAILED"){
+		query = append(query, bson.E{Key: "statusmessage", Value: input.Status})
+	}
+
 	findOptions := options.Find()
 	if input.SortBy != "" {
 		sort := bson.D{{Key: input.SortBy, Value: input.SortOrder}}
 		findOptions.SetSort(sort)
 	} else {
-		sort := bson.D{{Key: "audittime", Value: -1}}
+		sort := bson.D{{Key: "audittime", Value: 1}}
 		findOptions.SetSort(sort)
 	}
 
@@ -2245,6 +2215,7 @@ func ListAdminAudit(input dto.ListAdminAuditRequest) dto.ListAdminAuditResponse 
 	var listaudit []models.AdminAudit
 	cursor, err := config.AdminAudit_Collection.Find(context.Background(), query, findOptions)
 	if err != nil {
+		log.Println("Error while Finding ===========>")
 		var response dto.ListAdminAuditResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
@@ -2276,6 +2247,8 @@ func ListAdminAudit(input dto.ListAdminAuditRequest) dto.ListAdminAuditResponse 
 		var singleaudit models.AdminAudit
 		err = cursor.Decode(&singleaudit)
 		if err != nil {
+			log.Println(err)
+			log.Println("Error while Decodeing")
 			var response dto.ListAdminAuditResponse
 			response.StatusCode = "200"
 			response.Status = "FAILED"
@@ -2358,7 +2331,7 @@ func ListDeveloperAudit(input dto.ListDeveloperAuditRequest) dto.ListDeveloperAu
 		audit.APIName = "ListDeveloperAudit"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -2532,7 +2505,7 @@ func ListEditedAdmin(input dto.ListEditedAdminRequest) dto.ListEditedAdminRespon
 		audit.APIName = "ListEditedAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -2706,7 +2679,7 @@ func ListDeletedAdmin(input dto.ListDeletedAdminRequest) dto.ListDeletedAdminRes
 		audit.APIName = "ListDeletedAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -2880,7 +2853,7 @@ func ListBlockedAdmin(input dto.ListBlockedAdminRequest) dto.ListBlockedAdminRes
 		audit.APIName = "ListBlockedAdmin"
 		audit.AdminID = "NOT FOUND"
 		audit.Message = "LOGIN EXPIRED"
-		audit.Error = err
+		
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -3060,7 +3033,7 @@ func ValidateAdminToken(input dto.ValidateAdminTokenRequest) dto.ValidateAdminTo
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
-		audit.Error = err
+		
 		audit.StatusMessage = "SUCCESS"
 
 		go AdminAudit(audit)
@@ -3073,7 +3046,6 @@ func ValidateAdminToken(input dto.ValidateAdminTokenRequest) dto.ValidateAdminTo
 	response.Responsetime = time.Now()
 	response.Valid = true
 
-
 	var audit models.AdminAudit
 	audit.APIName = "ValidateAdminToken"
 	audit.AdminID = id
@@ -3081,15 +3053,15 @@ func ValidateAdminToken(input dto.ValidateAdminTokenRequest) dto.ValidateAdminTo
 	audit.Payload = input
 	audit.ServiceName = "Admin"
 	audit.Status = 200
-	audit.Error = err
+	
 	audit.StatusMessage = "SUCCESS"
 
 	go AdminAudit(audit)
 	return response
 }
 
-// Approve Admin 
-func ApproveAdmin(input dto.ApproveAdminRequest)dto.ApproveAdminResponse{
+// Approve Admin
+func ApproveAdmin(input dto.ApproveAdminRequest) dto.ApproveAdminResponse {
 	if len(input.PublicKey) < 30 || len(input.Token) < 20 || !IsValidEmail(input.AdminEmail) {
 		var response dto.ApproveAdminResponse
 		response.StatusCode = "200"
@@ -3126,14 +3098,14 @@ func ApproveAdmin(input dto.ApproveAdminRequest)dto.ApproveAdminResponse{
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
-		audit.Error = err
+		
 		audit.StatusMessage = "FAILED"
 
 		go AdminAudit(audit)
 		return response
 	}
 
-	if email != constants.AdminEmail{
+	if email != constants.AdminEmail {
 		var response dto.ApproveAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
@@ -3144,20 +3116,20 @@ func ApproveAdmin(input dto.ApproveAdminRequest)dto.ApproveAdminResponse{
 		var audit models.AdminAudit
 		audit.APIName = "ApproveAdmin"
 		audit.AdminID = "NOT FOUND"
-		audit.Message = "NOT A SUPER ADMIN BUT TRY TO APPROVE ADMIN DONE BY: "+email
+		audit.Message = "NOT A SUPER ADMIN BUT TRY TO APPROVE ADMIN DONE BY: " + email
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
-		audit.Error = err
+		
 		audit.StatusMessage = "FAILED"
 
 		go AdminAudit(audit)
 		return response
 	}
-	filter := bson.M{"email":input.AdminEmail}
+	filter := bson.M{"email": input.AdminEmail}
 	var admin models.Admin
-	err = config.Admin_Collection.FindOne(context.Background(),filter).Decode(&admin)
-	if err != nil{
+	err = config.Admin_Collection.FindOne(context.Background(), filter).Decode(&admin)
+	if err != nil {
 		var response dto.ApproveAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
@@ -3168,29 +3140,28 @@ func ApproveAdmin(input dto.ApproveAdminRequest)dto.ApproveAdminResponse{
 		var audit models.AdminAudit
 		audit.APIName = "ApproveAdmin"
 		audit.AdminID = "NOT FOUND"
-		audit.Message = "ADMIN WITH THE GIVEN EMAIL NOT FOUND DONE BY: "+email
+		audit.Message = "ADMIN WITH THE GIVEN EMAIL NOT FOUND DONE BY: " + email
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
-		audit.Error = err
+		
 		audit.StatusMessage = "FAILED"
 
 		go AdminAudit(audit)
 		return response
 	}
 
-	if admin.IsApproved{
+	if admin.IsApproved {
 		var response dto.ApproveAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "ADMIN ALREADY APPROVED"
 		response.ApprovedTime = time.Now()
-	
 
 		var audit models.AdminAudit
 		audit.APIName = "ApproveAdmin"
 		audit.AdminID = "NOT FOUND"
-		audit.Message = "ADMIN ALREADY APPROVED DONE BY: "+email
+		audit.Message = "ADMIN ALREADY APPROVED DONE BY: " + email
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
@@ -3200,32 +3171,30 @@ func ApproveAdmin(input dto.ApproveAdminRequest)dto.ApproveAdminResponse{
 		return response
 	}
 	update := bson.M{"$set": bson.M{"isapproved": true}}
-	_,err = config.Admin_Collection.UpdateOne(context.Background(),filter,update)
-	if err != nil{
+	_, err = config.Admin_Collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
 		var response dto.ApproveAdminResponse
 		response.StatusCode = "200"
 		response.Status = "FAILED"
 		response.Message = "APPROVAL FAILED"
 		response.ApprovedTime = time.Now()
 		response.Error = err
-	
 
 		var audit models.AdminAudit
 		audit.APIName = "ApproveAdmin"
 		audit.AdminID = "NOT FOUND"
-		audit.Message = "PROBLEM IN UPDATEING IN ADMIN COLLECTION DONE BY:"+email
+		audit.Message = "PROBLEM IN UPDATEING IN ADMIN COLLECTION DONE BY:" + email
 		audit.Payload = input
 		audit.ServiceName = "Admin"
 		audit.Status = 200
 		audit.StatusMessage = "FAILED"
-		audit.Error = err
+		
 
 		var dev models.DeveloperAudit
-        dev.Audit = audit
+		dev.Audit = audit
 		dev.Message = "ERROR IN UPDATEING IN ADMIN COLLECTION"
 
-		
-        go DeveloperAudit(dev)
+		go DeveloperAudit(dev)
 		go AdminAudit(audit)
 		return response
 	}
@@ -3235,16 +3204,404 @@ func ApproveAdmin(input dto.ApproveAdminRequest)dto.ApproveAdminResponse{
 	response.Message = "ADMIN APPROVED"
 	response.ApprovedTime = time.Now()
 
-
 	var audit models.AdminAudit
 	audit.APIName = "ApproveAdmin"
 	audit.AdminID = email
-	audit.Message = "ADMIN "+input.AdminEmail+" APPROVED SUCCESSFULLY DONE BY:"+email
+	audit.Message = "ADMIN " + input.AdminEmail + " APPROVED SUCCESSFULLY DONE BY:" + email
 	audit.Payload = input
 	audit.ServiceName = "Admin"
 	audit.Status = 200
 	audit.StatusMessage = "SUCCESS"
-    
+
+	return response
+}
+
+// Reset Password
+func ResetPassword(input dto.ResetPasswordRequest) dto.ResetPasswordResponse {
+	if len(input.PublicKey) < 30 || len(input.Token) < 20 || !IsValidEmail(input.AdminEmail) || len(input.Reason) < 2 {
+		var response dto.ResetPasswordResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Wrong Input Data"
+		response.Resetedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetPassword"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "INVALID INPUT"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	email, err := ExtractID(input.Token, []byte(input.PublicKey), "email", constants.AdminTokenKey)
+	adminid, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
+	name, err := ExtractID(input.Token, []byte(input.PublicKey), "name", constants.AdminTokenKey)
+	if err != nil {
+		var response dto.ResetPasswordResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "LOGIN EXPIRED"
+		response.Resetedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetPassword"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "LOGIN EXPIRED"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	if email != constants.AdminEmail && input.AdminEmail != email {
+		var response dto.ResetPasswordResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ACCESS DENIED"
+		response.Resetedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetPasssword"
+		audit.AdminID = adminid
+		audit.Message = "NOT A SUPER ADMIN OR OWN ACCOUNT BUT TRY TO RESET ADMIN PASSWORD DONE BY: " + email
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+	password, HashPassword := GenerateHashPassword()
+	log.Println(password)
+	filter := bson.M{"email": input.AdminEmail}
+	var restAdmin models.Admin
+	err = config.Admin_Collection.FindOne(context.Background(), filter).Decode(&restAdmin)
+	if err != nil {
+		var response dto.ResetPasswordResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ADMIN WITH THE GIVEN EMAIL NOT FOUND"
+		response.Resetedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetPasssword"
+		audit.AdminID = adminid
+		audit.Message = "ADMIN WITH THE GIVEN EMAIL NOT FOUND BUT TRY TO RESET ADMIN PASSWORD DONE BY: " + email
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+	editdata := models.EditedAdmin{
+		EditID:           GenerateUniqueEditID(),
+		EditedByName:     name,
+		EditedById:       adminid,
+		EditedByEmail:    email,
+		FeildUpdated:     "password",
+		NewValueUpdated:  HashPassword,
+		Reason:           input.Reason,
+		AdminEditedID:    restAdmin.AdminID,
+		AdminEditedEmail: restAdmin.Email,
+		EditTime:         time.Now(),
+		OldValue:         restAdmin.Password,
+	}
+
+	_, err = config.AdminEdited_Collection.InsertOne(context.Background(), editdata)
+	if err != nil {
+		var response dto.ResetPasswordResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Error in Editing"
+		response.Resetedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetPassword"
+		audit.AdminID = adminid
+		audit.Message = "ERROR WHILE ADDING DATA TO EDIT ADMIN DATABASE"
+		
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ERROR WHILE INSERTING DATA TO EDIT ADMIN COLLECTION"
+		go DeveloperAudit(dev)
+		go AdminAudit(audit)
+		return response
+	}
+
+	update := bson.M{"$set": bson.M{"password": HashPassword}}
+	_, err = config.Admin_Collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Println(err)
+		var response dto.ResetPasswordResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ERROR WHILE RESETING"
+		response.Resetedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetPasssword"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "THERE IS A PROBLEM WHILE UPDATING"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ERROR WHILE UPDATEING ADMIN PASSWORD"
+
+		go DeveloperAudit(dev)
+		go AdminAudit(audit)
+		return response
+
+	}
+	var response dto.ResetPasswordResponse
+	response.StatusCode = "200"
+	response.Status = "SUCCESS"
+	response.Message = "PASSWORD RESETED SUCCEESSFULLY"
+	response.Resetedtime = time.Now()
+
+	var audit models.AdminAudit
+	audit.APIName = "ResetPasssword"
+	audit.AdminID = adminid
+	audit.Message = "PASSWORD RESETED SUCCESSFULLY BY " + email
+	audit.Payload = input
+	audit.ServiceName = "Admin"
+	audit.Status = 200
+	
+	audit.StatusMessage = "SUCCESS"
+
+	go AdminAudit(audit)
+	// go SendPasswordResetEmail(input.AdminEmail,password,email)
+	return response
+}
+
+// Reset Gauth
+func ResetGauth(input dto.ResetGauthRequest) dto.ResetGauthResponse {
+	if len(input.PublicKey) < 30 || len(input.Token) < 20 || !IsValidEmail(input.AdminEmail) || len(input.Reason) < 2 {
+		var response dto.ResetGauthResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Wrong Input Data"
+		response.Resetedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetGauth"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "INVALID INPUT"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	email, err := ExtractID(input.Token, []byte(input.PublicKey), "email", constants.AdminTokenKey)
+	adminid, err := ExtractID(input.Token, []byte(input.PublicKey), "adminid", constants.AdminTokenKey)
+	name, err := ExtractID(input.Token, []byte(input.PublicKey), "name", constants.AdminTokenKey)
+	if err != nil {
+		var response dto.ResetGauthResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "LOGIN EXPIRED"
+		response.Resetedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetGauth"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "LOGIN EXPIRED"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	if email != constants.AdminEmail && input.AdminEmail != email {
+		var response dto.ResetGauthResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ACCESS DENIED"
+		response.Resetedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetGauth"
+		audit.AdminID = adminid
+		audit.Message = "NOT A SUPER ADMIN OR OWN ACCOUNT BUT TRY TO RESET GAUTH DONE BY: " + email
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+
+	filter := bson.M{"email": input.AdminEmail}
+	var restAdmin models.Admin
+	err = config.Admin_Collection.FindOne(context.Background(), filter).Decode(&restAdmin)
+	if err != nil {
+		var response dto.ResetGauthResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ADMIN WITH THE GIVEN EMAIL NOT FOUND"
+		response.Resetedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetGauth"
+		audit.AdminID = adminid
+		audit.Message = "ADMIN WITH THE GIVEN EMAIL NOT FOUND BUT TRY TO RESET GAUTH DONE BY: " + email
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+	newgauth, err := GenerateSecret()
+	if err != nil {
+		var response dto.ResetGauthResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ERROR IN GENERATING NEW GAUTH"
+		response.Resetedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetGauth"
+		audit.AdminID = adminid
+		audit.Message = "ERROR IN GENERATING GAUTH"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		go AdminAudit(audit)
+		return response
+	}
+	editdata := models.EditedAdmin{
+		EditID:           GenerateUniqueEditID(),
+		EditedByName:     name,
+		EditedById:       adminid,
+		EditedByEmail:    email,
+		FeildUpdated:     "totp",
+		NewValueUpdated:  newgauth,
+		Reason:           input.Reason,
+		AdminEditedID:    restAdmin.AdminID,
+		AdminEditedEmail: restAdmin.Email,
+		EditTime:         time.Now(),
+		OldValue:         restAdmin.SecretKey,
+	}
+
+	_, err = config.AdminEdited_Collection.InsertOne(context.Background(), editdata)
+	if err != nil {
+		var response dto.ResetGauthResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "Error in Reseting"
+		response.Resetedtime = time.Now()
+		response.Error = err
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetGauth"
+		audit.AdminID = adminid
+		audit.Message = "ERROR WHILE ADDING DATA TO EDIT ADMIN DATABASE"
+		
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		audit.StatusMessage = "FAILED"
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ERROR WHILE INSERTING DATA TO EDIT ADMIN COLLECTION"
+		go DeveloperAudit(dev)
+		go AdminAudit(audit)
+		return response
+	}
+
+	update := bson.M{"$set": bson.M{"gauth": newgauth}}
+	_, err = config.Admin_Collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Println(err)
+		var response dto.ResetGauthResponse
+		response.StatusCode = "200"
+		response.Status = "FAILED"
+		response.Message = "ERROR WHILE RESETING"
+		response.Resetedtime = time.Now()
+
+		var audit models.AdminAudit
+		audit.APIName = "ResetGauth"
+		audit.AdminID = "NOT FOUND"
+		audit.Message = "THERE IS A PROBLEM WHILE UPDATING"
+		audit.Payload = input
+		audit.ServiceName = "Admin"
+		audit.Status = 200
+		
+		audit.StatusMessage = "FAILED"
+
+		var dev models.DeveloperAudit
+		dev.Audit = audit
+		dev.Message = "ERROR WHILE UPDATEING ADMIN GAUTH"
+
+		go DeveloperAudit(dev)
+		go AdminAudit(audit)
+		return response
+
+	}
+	var response dto.ResetGauthResponse
+	response.StatusCode = "200"
+	response.Status = "SUCCESS"
+	response.Message = "GAUTH RESETED SUCCEESSFULLY"
+	response.Resetedtime = time.Now()
+
+	var audit models.AdminAudit
+	audit.APIName = "ResetGauth"
+	audit.AdminID = adminid
+	audit.Message = "GAUTH RESETED SUCCESSFULLY BY " + email
+	audit.Payload = input
+	audit.ServiceName = "Admin"
+	audit.Status = 200
+	
+	audit.StatusMessage = "SUCCESS"
+
+	go AdminAudit(audit)
+	// go SendPasswordResetEmail(input.AdminEmail,password,email)
 	return response
 }
 

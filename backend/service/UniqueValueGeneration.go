@@ -54,6 +54,12 @@ func GenerateUniqueBlockID() string {
 	return fmt.Sprintf("%d%s", time.Now().UnixNano(), GetRandomString(12))
 }
 
+func GenerateHashPassword() (string,string) {
+	var password = fmt.Sprintf("%d%s", time.Now().UnixNano(), GetRandomString(8))
+	return password,HashAdminPassword(password)
+}
+
+
 
 // Custom function to generate random characters (for demonstration purposes)
 func GetRandomString(length int) string {

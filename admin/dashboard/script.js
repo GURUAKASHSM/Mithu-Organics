@@ -1,25 +1,98 @@
-function HideAll(){
+CheckTokenValidity()
+function CheckTokenValidity() {
+    const data = localStorage.getItem('admindata');
+    const userData = JSON.parse(data)
+    console.log(userData)
+    if (userData) {
+        var formData = {
+            token: userData.token,
+            publickey: userData.publickey
+        }
+    } else {
+        window.location.href = "/signin"
+    }
+    console.log(formData)
+    fetch("http://localhost:8080/vailidateadmintoken", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+    })
+        .then(response => {
+            console.log(response)
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();  // Parse the JSON from the response
+        })
+        .then(data => {
+            console.log(data)
+
+            if (data.result.valid) {
+                if (userData.canupdate) {
+                    showCanUpdate()
+                }
+
+                if (userData.candelete) {
+                    showCanDelete()
+                }
+
+                if (userData.canalteradmin) {
+                    showCanAlterAdmin()
+                }
+                if (userData.email == "mithuorganics@gmail.com") {
+                    showSuperAdmin()
+                }
+
+            } else {
+                localStorage.removeItem('admindata')
+                window.location.href = "/signin"
+                return
+            }
+
+        })
+        .catch(error => {
+            showToast(error.message, "Danger", 0);
+            return
+        });
+}
+
+function HideAll() {
+    console.log(1)
     document.getElementById("shutdown-form-container").style.display = 'none';
-    document.getElementById('employee-wrapper').style.display = 'none';
+    console.log(3)
     document.querySelector('.container-p-y').style.display = 'none';
-    document.getElementById("notapprovedseller").style.display = 'none';
+    console.log(5)
     document.getElementById('single-order-container').style.display = 'none';
+    console.log(6)
     document.querySelector('.outer-container').style.display = 'none';
+    console.log(7)
     document.getElementById("clearbuttons-container").style.display = 'none';
-    document.getElementById('sellersnip').style.display = 'none';
+    console.log(9)
     document.getElementById('feedbacksnip').style.display = 'none';
+    console.log(10)
     document.getElementById("clear-form-container").style.display = 'none'
+    console.log(11)
     document.getElementById('Inventorysnip').style.display = 'none';
-    document.querySelector('.wrapper').style.display = 'none';
+    console.log(13)
     document.getElementById('admin-wrapper').style.display = 'none';
+    console.log(14)
     document.getElementById("orders-container").style.display = 'none';
-    document.getElementById("block-form-container").style.display = 'none';
-    document.getElementById('update-form-admin-container').style.display = 'none';
+    console.log(17)
     document.getElementById('snippetContent').style.display = 'none';
+    console.log(18)
     document.querySelector('.display-view').style.display = 'none';
+    console.log(19)
     document.getElementById("calendar").style.display = 'none';
+    console.log(20)
     document.getElementById("event-wrapper").style.display = 'none';
+    console.log(21)
     document.getElementById('workersnip').style.display = 'none';
+    document.getElementById('auditsnip').style.display = 'none';
+    document.getElementById("displayeditadmin").style.display = "none"
+    document.getElementById("devauditsnip").style.display = "none";
+
 }
 var adminData = localStorage.getItem('admindata');
 if (adminData) {
@@ -1013,29 +1086,8 @@ document.getElementById("employee-wrapper").addEventListener("submit", function 
 });
 
 function DisplayCreateAdmin() {
-    document.getElementById("shutdown-form-container").style.display = 'none';
-    document.getElementById('employee-wrapper').style.display = 'none';
-    document.getElementById('workersnip').style.display = 'none';
-    document.querySelector('.wrapper').style.display = 'none';
-    document.getElementById("clear-form-container").style.display = 'none'
-    document.querySelector('.outer-container').style.display = 'none';
-    document.getElementById("notapprovedseller").style.display = 'none';
-    document.getElementById('single-order-container').style.display = 'none';
-    document.querySelector('.container-p-y').style.display = 'none';
-    document.getElementById('snippetContent').style.display = 'none';
-    document.getElementById('sellersnip').style.display = 'none';
-    document.getElementById("block-form-container").style.display = 'none';
-    document.getElementById('Inventorysnip').style.display = 'none';
-    document.getElementById('update-form-admin-container').style.display = 'none';
-    document.getElementById('admin-wrapper').style.display = 'block';
-    document.getElementById("clearbuttons-container").style.display = 'none';
-    document.getElementById("qr-code").style.display = 'none';
-    document.querySelector('.display-view').style.display = 'none';
-    document.getElementById("orders-container").style.display = 'none';
-    document.getElementById('feedbacksnip').style.display = 'none';
-    document.getElementById("calendar").style.display = 'none';
-    document.getElementById("event-wrapper").style.display = 'none';
-    document.getElementById("admin-input").style.display = 'block';
+    HideAll()
+    document.getElementById("admin-wrapper").style.display = 'block';
 }
 
 document.getElementById("admin-wrapper").addEventListener("submit", function (event) {
@@ -1105,6 +1157,11 @@ function CreateEmailandPassword() {
         return
     }
     email.value = (name.toLowerCase()).replace(/\s/g, '') + '@anon.com'
+}
+
+function validateEmail(email) {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
 }
 
 function search() {
@@ -2463,7 +2520,7 @@ async function GetOrder(id) {
           </div>
         </div>
       </div>`
-            
+
             document.getElementById('single-order-container').innerHTML = html;
             document.getElementById('single-order-container').style.display = 'block';
 
@@ -2506,7 +2563,7 @@ async function DeleteOrder(id) {
 }
 
 
-function showConfirmation(function_name, question, option1, option2, id,value) {
+function showConfirmation(function_name, question, option1, option2, id, value) {
     console.log("In Conformation")
     document.getElementById("conformationoverlay").classList.add("conformationactive");
     document.getElementById("confirmationDialog").classList.add("conformationactive");
@@ -2515,7 +2572,7 @@ function showConfirmation(function_name, question, option1, option2, id,value) {
     document.getElementById("confirmationfalse").innerHTML = option2;
 
     document.getElementById("conformationtrue").addEventListener("click", function () {
-        function_name(id,value);
+        function_name(id, value);
         hideConfirmationDialog();
     });
     document.getElementById("confirmationfalse").addEventListener("click", function () {
@@ -2531,42 +2588,42 @@ function hideConfirmationDialog() {
 
 function displayObjectInPopup(objStr) {
     const obj = JSON.parse(decodeURIComponent(objStr));
-  
+
     // Disable scrolling and interactions on the body
     document.body.classList.add('popup-open');
-  
+
     // Create an overlay to darken the background
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
     document.body.appendChild(overlay);
-  
+
     // Create the popup container
     const popup = document.createElement('div');
     popup.className = 'popup';
-  
+
     // Create a preformatted text element to display the object
     const pre = document.createElement('pre');
     pre.textContent = JSON.stringify(obj, null, 2);
-  
+
     // Create a close button
     const closeButton = document.createElement('div');
     closeButton.className = 'close-button';
     closeButton.innerHTML = '&times;';
     closeButton.onclick = () => {
-      document.body.removeChild(popup);
-      document.body.removeChild(overlay);
-      document.body.classList.remove('popup-open');
+        document.body.removeChild(popup);
+        document.body.removeChild(overlay);
+        document.body.classList.remove('popup-open');
     };
-  
+
     // Append the preformatted text and close button to the popup
     popup.appendChild(closeButton);
     popup.appendChild(pre);
-  
+
     // Append the popup to the body
     document.body.appendChild(popup);
-  }
+}
 
-  function openCustomPopup(message, onSubmit) {
+function openCustomPopup(message, onSubmit) {
     // Create overlay to disable other functionalities
     const overlay = document.createElement('div');
     overlay.style.position = 'fixed';
@@ -2608,12 +2665,12 @@ function displayObjectInPopup(objStr) {
     document.body.style.overflow = 'hidden';
 
     // Disable click on overlay
-    overlay.addEventListener('click', function(event) {
+    overlay.addEventListener('click', function (event) {
         event.stopPropagation();
     });
 
     // Function to handle cancel button click
-    const cancelHandler = function() {
+    const cancelHandler = function () {
         document.body.removeChild(overlay);
         document.body.removeChild(popupContainer);
         document.body.style.overflow = 'auto'; // Enable scroll back
@@ -2624,7 +2681,7 @@ function displayObjectInPopup(objStr) {
     document.getElementById('cancelButton').addEventListener('click', cancelHandler);
 
     // Function to handle submit button click
-    const submitHandler = function() {
+    const submitHandler = function () {
         const inputValue = document.getElementById('popupInput').value;
         if (inputValue.trim() === '') {
             document.getElementById('errorMessage').style.display = 'block';
@@ -2642,23 +2699,22 @@ function displayObjectInPopup(objStr) {
     // Add hover effect to buttons
     const cancelButton = document.getElementById('cancelButton');
     const submitButton = document.getElementById('submitButton');
-    cancelButton.addEventListener('mouseenter', function() {
+    cancelButton.addEventListener('mouseenter', function () {
         this.style.backgroundColor = '#ff8c79';
     });
 
-    cancelButton.addEventListener('mouseleave', function() {
+    cancelButton.addEventListener('mouseleave', function () {
         this.style.backgroundColor = '#ff6347';
     });
 
-    submitButton.addEventListener('mouseenter', function() {
+    submitButton.addEventListener('mouseenter', function () {
         this.style.backgroundColor = '#3cb371';
     });
 
-    submitButton.addEventListener('mouseleave', function() {
+    submitButton.addEventListener('mouseleave', function () {
         this.style.backgroundColor = '#32CD32';
     });
 }
 
 
 
-  

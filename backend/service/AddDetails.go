@@ -42,7 +42,6 @@ func AddDefaultAdmin() {
 		audit.AuditID = GenerateUniqueAuditID()
 		audit.AuditTime = time.Now()
 		admin.Password = ""
-		audit.Error = err
 		audit.Message = "ERROR IN CREATEING PUBLIC & PRIVATE KEY"
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
@@ -70,7 +69,6 @@ func AddDefaultAdmin() {
 		audit.AdminID = admin.AdminID
 		audit.AuditID = GenerateUniqueAuditID()
 		audit.AuditTime = time.Now()
-		audit.Error = err
 		audit.Message = "ERROR IN CREATEING SECRET KEY"
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
@@ -103,7 +101,6 @@ func AddDefaultAdmin() {
 		audit.AdminID = admin.AdminID
 		audit.AuditID = GenerateUniqueAuditID()
 		audit.AuditTime = time.Now()
-		audit.Error = err
 		audit.Message = "ADMIN WITH EMIAL & ADMINID ALREADY EXISTS"
 		audit.Payload = admin
 		audit.ServiceName = "Admin"
@@ -120,7 +117,6 @@ func AddDefaultAdmin() {
 			audit.AdminID = admin.AdminID
 			audit.AuditID = GenerateUniqueAuditID()
 			audit.AuditTime = time.Now()
-			audit.Error = err
 			audit.Message = "ERROR IN CREATING NEW ADMIN"
 			admin.Password = ""
 			audit.Payload = admin
@@ -143,7 +139,6 @@ func AddDefaultAdmin() {
 		audit.AdminID = admin.AdminID
 		audit.AuditID = GenerateUniqueAuditID()
 		audit.AuditTime = time.Now()
-		audit.Error = err
 		admin.Password = ""
 		audit.Message = "ADMIN CREATED SUCCESSFULLY"
 		audit.Payload = admin

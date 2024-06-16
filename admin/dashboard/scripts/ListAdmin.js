@@ -9,35 +9,7 @@ function DisplayAllAdmin() {
     let candelete = document.getElementById("listadmin-candelete")
     let canalteradmin = document.getElementById("listadmin-canalteradmin")
     console.log(isapproved.checked)
-    if (isapproved.checked) {
-        isapproved = "TRUE"
-    } else {
-        isapproved = "FALSE"
-    }
-
-    if (isblocked.checked) {
-        isblocked = "TRUE"
-    } else {
-        isblocked = "FALSE"
-    }
-
-    if (canupdate.checked) {
-        canupdate = "TRUE"
-    } else {
-        canupdate = "FALSE"
-    }
-
-    if (candelete.checked) {
-        candelete = "TRUE"
-    } else {
-        candelete = "FALSE"
-    }
-
-    if (canalteradmin.checked) {
-        canalteradmin = "TRUE"
-    } else {
-        canalteradmin = "FALSE"
-    }
+    
     let fromdate = document.getElementById("listadmin-fromdate").value
     let todate = document.getElementById("listadmin-todate").value
     let searchby = document.getElementById("listadmin-searchby").value
@@ -50,12 +22,11 @@ function DisplayAllAdmin() {
         noofdata:Number(document.getElementById("listadmin-pagenation").value),
         sortby: document.getElementById("listadmin-orderby").value,
         sortorder: Number(document.getElementById("listadmin-ordervalue").value),
-
-        isapproved: isapproved,
-        isblocked: isblocked,
-        canupdate: canupdate,
-        candelete: candelete,
-        canalteradmin: canalteradmin
+        isapproved : document.getElementById("listadmin-isapproved").value,
+        isblocked : document.getElementById("listadmin-isblocked").value,
+        canupdate : document.getElementById("listadmin-canupdate").value,
+        candelete : document.getElementById("listadmin-candelete").value,
+        canalteradmin : document.getElementById("listadmin-canalteradmin").value,
     }
     if (searchby && searchvalue) {
         formData["searchby"] = searchby
@@ -121,7 +92,7 @@ function DisplayAllAdmin() {
                <li  onclick="displayObjectInPopup('${encodeURIComponent(JSON.stringify(admin))}')"><a class="text-danger" data-toggle="tooltip" title=""
               data-original-title="Delete"><i class="far fa-eye"></i></a></li>`
                 if (adminObject.email != admin.email && admin.email != "mithuorganics@gmail.com") {
-                    html += `<li  onclick="deleteWorker('${admin.email}');DisplayAllWorkers();recentPage = 'worker';"><a class="text-danger" data-toggle="tooltip" title=""
+                    html += `<li  onclick="DisplatEditAdmin(event,'${admin.email}');"><a class="text-danger" data-toggle="tooltip" title=""
                 data-original-title="Delete"><i class="far fa-edit"></i></a></li>`
                 }
                 if (adminObject.email != admin.email && admin.email != "mithuorganics@gmail.com") {
@@ -156,11 +127,11 @@ function DisplayAllAdmin() {
 
 DefaultListAdminSet()
 function DefaultListAdminSet() {
-    document.getElementById("listadmin-isapproved").checked = true
-    document.getElementById("listadmin-isblocked").checked = false
-    document.getElementById("listadmin-canupdate").checked = true
-    document.getElementById("listadmin-candelete").checked = true
-    document.getElementById("listadmin-canalteradmin").checked = true
+    document.getElementById("listadmin-isapproved").value = "ALL"
+    document.getElementById("listadmin-isblocked").value = "ALL"
+    document.getElementById("listadmin-canupdate").value = "ALL"
+    document.getElementById("listadmin-candelete").value = "ALL"
+    document.getElementById("listadmin-canalteradmin").value = "ALL"
     document.getElementById("listadmin-fromdate").value = ""
     document.getElementById("listadmin-todate").value = ""
     document.getElementById("listadmin-searchby").value = ""

@@ -12,7 +12,8 @@
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
   <!--===============================================================================================-->
   <!-- <link rel="icon" type="image/png" href="/images/icons/favicon.ico" /> -->
   <!--===============================================================================================-->
@@ -35,6 +36,7 @@
   <link rel="stylesheet" type="text/css" href="./css/util.css">
   <link rel="stylesheet" type="text/css" href="./css/main.css">
   <!--===============================================================================================-->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- STYLE CSS -->
   <link rel="stylesheet" href="./css/style.css">
@@ -110,6 +112,116 @@
       }
     }
 
+    .img-account-profile {
+      height: 10rem;
+    }
+
+    .rounded-circle {
+      border-radius: 50% !important;
+    }
+
+    .card {
+      box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+    }
+
+    .card .card-header {
+      font-weight: 500;
+    }
+
+    .card-header:first-child {
+      border-radius: 0.35rem 0.35rem 0 0;
+    }
+
+    .card-header {
+      padding: 1rem 1.35rem;
+      margin-bottom: 0;
+      background-color: rgba(33, 40, 50, 0.03);
+      border-bottom: 1px solid rgba(33, 40, 50, 0.125);
+    }
+
+    .form-control,
+    .dataTable-input {
+      display: block;
+      width: 100%;
+      padding: 0.875rem 1.125rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1;
+      color: #69707a;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #c5ccd6;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      border-radius: 0.35rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .nav-borders .nav-link.active {
+      color: #0061f2;
+      border-bottom-color: #0061f2;
+    }
+
+    .nav-borders .nav-link {
+      color: #69707a;
+      border-bottom-width: 0.125rem;
+      border-bottom-style: solid;
+      border-bottom-color: transparent;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      padding-left: 0;
+      padding-right: 0;
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+
+    /* Hide default checkbox */
+    .custom-checkbox {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #007bff;
+      border-radius: 3px;
+      position: relative;
+      cursor: pointer;
+      outline: none;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    /* Style when checked */
+    .custom-checkbox:checked {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+
+    .custom-checkbox:checked::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 5px;
+      border: 2px solid white;
+      border-width: 0 0 2px 2px;
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+    /* Add hover effect */
+    .custom-checkbox:hover {
+      border-color: #0056b3;
+    }
+
+    .form-check-label {
+      cursor: pointer;
+    }
+
+    .fa-user-shield {
+      color: #007bff;
+    }
+
     /* The switch - the box around the slider */
     .switch {
       position: relative;
@@ -118,47 +230,51 @@
       height: 17px;
 
     }
+
     body.popup-open {
-    overflow: hidden;
-    pointer-events: none;
-  }
-  .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 1.5em;
-    cursor: pointer;
-    color: #000;
-    font-weight: bold;
-    pointer-events: auto; /* Allow interactions on the close button */
-  }
+      overflow: hidden;
+      pointer-events: none;
+    }
 
-  .popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    background-color: white;
-    padding: 40px;
-    border: 2px solid #000;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    width: 80%;
-    max-height: 80%;
-    overflow-y: auto;
-    font-size: 1.5em;
-    pointer-events: auto; /* Allow interactions inside the popup */
-  }
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #000;
+      font-weight: bold;
+      pointer-events: auto;
+      /* Allow interactions on the close button */
+    }
 
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9998;
-  }
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      background-color: white;
+      padding: 40px;
+      border: 2px solid #000;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      width: 80%;
+      max-height: 80%;
+      overflow-y: auto;
+      font-size: 1.5em;
+      pointer-events: auto;
+      /* Allow interactions inside the popup */
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9998;
+    }
 
 
     /* Hide default HTML checkbox */
@@ -1757,7 +1873,7 @@
             </a>
 
           </li>
-          <li class="menu-item">
+          <li class="menu-item listadmin">
             <a onclick="DisplayAllAdmin()" class="menu-link">
               <i class="menu-icon tf-icons mdi mdi-account-hard-hat-outline"></i>
               <div data-i18n="Misc" style="cursor: pointer;">Admin</div>
@@ -1783,84 +1899,79 @@
 
 
 
-          <li class="menu-header fw-medium mt-4" style="margin-top: -1000px;">
-            <span class="menu-header-text">Update</span>
-          </li>
-
-
-          <!-- Extended components -->
-          <li class="menu-item">
-            <a onclick="DisplayEdit()" class="menu-link">
-              <i class="menu-icon tf-icons mdi mdi-pencil-outline"></i>
-              <div data-i18n="Extended UI" style="cursor: pointer;">Edit</div>
-            </a>
-
-          </li>
-
-
-          <!-- Form Validation -->
-          <li class="menu-item">
-            <a onclick="Deletedata()" class="menu-link">
-              <i class="menu-icon tf-icons mdi mdi-delete-outline"></i>
-              <div data-i18n="Form Validation" style="cursor: pointer;">Delete</div>
-
-            </a>
-          </li>
-
+        <div class="createadmin">
           <li class="menu-header fw-medium mt-4" style="margin-top: -1000px;">
             <span class="menu-header-text">Create</span>
           </li>
 
-          <!-- Tables -->
-          <li class="menu-item" onclick="CreateSeller()">
-            <a class="menu-link">
-              <i class="menu-icon tf-icons mdi mdi-account-plus"></i>
-              <div data-i18n="Tables" style="cursor: pointer;">Create Seller</div>
-            </a>
-          </li>
-          <!-- Data Tables -->
-          <li class="menu-item" onclick="CreateWorker()">
-            <a class="menu-link">
-              <i class="menu-icon tf-icons mdi mdi-account-plus"></i>
-              <div data-i18n="Datatables" style="cursor: pointer;">Create Employee</div>
-
-            </a>
-          </li>
           <!--Admin Create-->
           <li class="menu-item" onclick="DisplayCreateAdmin()">
             <a class="menu-link">
-              <i class="menu-icon tf-icons mdi mdi-account-plus"></i>
+              <i class="menu-icon tf-icons mdi mdi-account-plus-outline"></i>
               <div data-i18n="Datatables" style="cursor: pointer;">Create Admin</div>
 
             </a>
           </li>
+        </div>
 
-
+        <div class="audit">
           <li class="menu-header fw-medium mt-4" style="margin-top: -1000px;">
-            <span class="menu-header-text">Approve & Block</span>
+            <span class="menu-header-text">Audit</span>
           </li>
 
-          <li class="menu-item" onclick="Displayallnotapprovedseller()">
+          <li class="menu-item" onclick="DisplayAdminAudit()">
             <a class="menu-link">
-              <i class="menu-icon tf-icons mdi mdi-account-check"></i>
-              <div data-i18n="Datatables" style="cursor: pointer;">Approve Seller</div>
+              <i class="menu-icon tf-icons mdi mdi-account-key-outline"></i>
+              <div data-i18n="Datatables" style="cursor: pointer;">Admin</div>
+
+            </a>
+          </li>
+
+          <li class="menu-item" onclick="DisplayCustomerAudit()">
+            <a class="menu-link">
+              <i class="menu-icon tf-icons mdi mdi-account-outline"></i>
+              <div data-i18n="Datatables" style="cursor: pointer;">Customer</div>
+
+            </a>
+          </li>
+
+          <!--Admin Create-->
+          <li class="menu-item" onclick="DisplayDeveloperAudit()">
+            <a class="menu-link">
+              <i class="menu-icon tf-icons mdi mdi-cloud-check-outline"></i>
+              <div data-i18n="Datatables" style="cursor: pointer;">Developer</div>
+
+            </a>
+          </li>
+
+          <!--Admin Create-->
+          <li class="menu-item" onclick="DisplayEditedAudit()">
+            <a class="menu-link">
+              <i class="menu-icon tf-icons mdi mdi-account-edit-outline"></i>
+              <div data-i18n="Datatables" style="cursor: pointer;">Edited</div>
 
             </a>
           </li>
           <!--Admin Create-->
-          <li class="menu-item" onclick="DisplayBlock()">
+          <li class="menu-item" onclick="DisplayBlockedAudit()">
             <a class="menu-link">
-              <i class="menu-icon tf-icons mdi mdi-account-cancel"></i>
-              <div data-i18n="Datatables" style="cursor: pointer;">Access Control</div>
-
+              <i class="menu-icon tf-icons mdi mdi-account-off-outline"></i>
+              <div data-i18n="Datatables" style="cursor: pointer;">Blocked</div>
             </a>
           </li>
+          <!--Admin Create-->
+          <li class="menu-item" onclick="DisplayDeletedAudit()">
+            <a class="menu-link">
+              <i class="menu-icon tf-icons mdi mdi-account-minus-outline"></i>
+              <div data-i18n="Datatables" style="cursor: pointer;">Deleted</div>
+            </a>
+          </li>
+        </div>
 
 
 
 
-
-
+          <div class="siteadimpannel">
           <li class="menu-header fw-medium mt-4" style="margin-top: -1000px;">
             <span class="menu-header-text">Site Administration Panel</span>
           </li>
@@ -1881,6 +1992,7 @@
 
             </a>
           </li>
+          </div>
 
           </ul>
         </div>
@@ -2242,36 +2354,7 @@
               </div>
             </div>
           </div>
-          <!-- Seller -->
-          <div id="sellersnip" style="display: none;">
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
-              integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous">
-            <div class="container mt-3 mb-4">
-              <div class="col-lg-9 mt-4 mt-lg-0">
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
-                      <table class="table manage-candidates-top mb-0">
-                        <thead>
-                          <tr>
-                            <th>Seller Name</th>
-                            <th class="text-center">Mobile No</th>
-                            <th class="action text-right">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody class="seller-list-body">
 
-                        </tbody>
-                      </table>
-
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!--Inventory-->
 
@@ -2334,7 +2417,7 @@
               </div>
             </div>
           </div>
-          <!--Worker-->
+          <!--Admin-->
           <div id="workersnip" style="display: none;margin-left: 9%;">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -2394,48 +2477,55 @@
                         <div class="booleanvalue" style="display: flex;justify-content: space-between;padding-top:2%">
                           <div class="approved">
                             <label>Is Approved:</label>
-                            <label class="switch">
-                              <input type="checkbox" id="listadmin-isapproved">
-                              <span class="slider round"></span>
-                            </label>
+                            <select id="listadmin-isapproved">
+                              <option value="ALL">ALL</option>
+                              <option value="TRUE">TRUE</option>
+                              <option value="FALSE">FALSE</option>
+                            </select>
                           </div>
                           <div class="blocked">
                             <label>Is Blocked:</label>
-                            <label class="switch">
-                              <input type="checkbox" id="listadmin-isblocked">
-                              <span class="slider round"></span>
-                            </label>
+                            <select id="listadmin-isblocked">
+                              <option value="ALL">ALL</option>
+                              <option value="TRUE">TRUE</option>
+                              <option value="FALSE">FALSE</option>
+                            </select>
                           </div>
 
                           <div class="update">
                             <label>Can Update:</label>
-                            <label class="switch">
-                              <input type="checkbox" id="listadmin-canupdate">
-                              <span class="slider round"></span>
-                            </label>
+                            <select id="listadmin-canupdate">
+                              <option value="ALL">ALL</option>
+                              <option value="TRUE">TRUE</option>
+                              <option value="FALSE">FALSE</option>
+                            </select>
                           </div>
 
                           <div class="delete">
                             <label>Can Delete:</label>
-                            <label class="switch">
-                              <input type="checkbox" id="listadmin-candelete">
-                              <span class="slider round"></span>
-                            </label>
+                            <select id="listadmin-candelete">
+                              <option value="ALL">ALL</option>
+                              <option value="TRUE">TRUE</option>
+                              <option value="FALSE">FALSE</option>
+                            </select>
                           </div>
 
                           <div class="changeadmin">
                             <label>Can Change Admin:</label>
-                            <label class="switch">
-                              <input type="checkbox" id="listadmin-canalteradmin">
-                              <span class="slider round"></span>
-                            </label>
+                            <select id="listadmin-canalteradmin">
+                              <option value="ALL">ALL</option>
+                              <option value="TRUE">TRUE</option>
+                              <option value="FALSE">FALSE</option>
+                            </select>
                           </div>
 
                         </div>
 
                         <div style="display: flex;justify-content: space-between;padding-top: 2%;padding-bottom: 2%;">
-                          <button style="width: 30%;border-radius: 5%;color: #000;" onclick="DefaultListAdminSet()">Reset</button>
-                          <button style="width: 30%;border-radius: 5%;color: #000;" onclick="DisplayAllAdmin()">Modify 🔍</button>
+                          <button style="width: 30%;border-radius: 5%;color: #000;"
+                            onclick="DefaultListAdminSet()">Reset</button>
+                          <button style="width: 30%;border-radius: 5%;color: #000;" onclick="DisplayAllAdmin()">Modify
+                            🔍</button>
                         </div>
                       </div>
                       <table class="table manage-candidates-top mb-0">
@@ -2468,333 +2558,223 @@
               </div>
             </div>
           </div>
-          <!--Delete-->
-
-          <div id="delete-form-container" class="outer-container" style="display: none;">
-            <i class="fas fa-arrow-left back-icon" onclick="BackButton()" style="margin-left: -70px;"></i>
-
-            <div class="limiter">
-              <div class="container-login100"
-                style="background-image: url('images/bg-01.jpg'); background-size: 80% 80%; margin-top: -110px; width: 1000px;margin-left: -110px;">
-
-                <form class="login100-form validate-form flex-sb flex-w" style="width: 500px; height: 500px;"
-                  id="delete-form">
-                  <span class="login100-form-title p-b-53" style="margin-top: -50px;">
-                    Delete
-                  </span>
-                  <div class="p-t-31 p-b-9" style="margin-top: -30px;">
-                    <span class="txt1">
-                      Select Collection:
-                    </span>
-                  </div>
-                  <div class="wrap-input100">
-                    <select id="collection" class="input100" name="collection">
-                      <option value="customer">Customer</option>
-                      <option value="inventory">Inventory</option>
-                      <option value="seller">Seller</option>
-                    </select>
-                    <span class="focus-input100"></span>
-                  </div>
-
-                  <div class="p-t-13 p-b-9">
-                    <span class="txt1">
-                      Delete by:
-                    </span>
-                  </div>
-                  <div class="wrap-input100 validate-input" data-validate="Password is required">
-                    <input class="input100" type="test" id="id" name="id">
-                    <span class="focus-input100"></span>
-                  </div>
-
-                  <div class="container-login100-form-btn m-t-17">
-                    <button class="login100-form-btn">
-                      Delete
-                    </button>
-                  </div>
-
-                  <div class="w-full text-center p-t-55">
 
 
 
-                  </div>
-                </form>
-              </div>
-
-            </div>
-
-
-            <div id="dropDownSelect1"></div>
-
-          </div>
-
-          <!--BLOCK / UNBLOCK-->
-
-          <div id="block-form-container" class="outer-container" style="display: none;">
-            <i class="fas fa-arrow-left back-icon" onclick="BackButton()" style="margin-left: -70px;"></i>
-
-            <div class="limiter">
-              <div class="container-login100"
-                style="background-image: url('images/bg-01.jpg'); background-size: 80% 80%; margin-top: -110px; width: 1000px;margin-left: -110px;">
-
-                <form class="login100-form validate-form flex-sb flex-w" style="width: 500px; height: 500px;"
-                  id="block-form">
-                  <span class="login100-form-title p-b-53" style="margin-top: -50px;">
-                    Access Control
-                  </span>
-                  <div class="p-t-31 p-b-9" style="margin-top: -30px;">
-                    <span class="txt1">
-                      Select Collection:
-                    </span>
-                  </div>
-                  <div class="wrap-input100">
-                    <select id="blockcollection" class="input100" name="collection">
-                      <option value="customer">Customer</option>
-                      <option value="seller">Seller</option>
-                    </select>
-                    <span class="focus-input100"></span>
-                  </div>
-
-                  <div class="p-t-13 p-b-9">
-                    <span class="txt1">
-                      Email to Block:
-                    </span>
-                  </div>
-                  <div class="wrap-input100 validate-input" data-validate="Email is required">
-                    <input class="input100" type="test" id="blockemail" name="blockemail">
-                    <span class="focus-input100"></span>
-                  </div>
-
-                  <div class="container-login100-form-btn m-t-17">
-                    <button class="login100-form-btn" onclick="BLockbyemail(event)">
-                      BLOCK / UNBLOCK
-                    </button>
-                  </div>
-
-                  <div class="w-full text-center p-t-55">
-
-
-
-                  </div>
-                </form>
-              </div>
-
-            </div>
-
-
-            <div id="dropDownSelect1"></div>
-
-          </div>
-
-
-          <!--Edit Data-->
-          <div id="update-form-admin-container" class="outer-container" style="display: none;">
-
-
-            <i class="fas fa-arrow-left back-icon" onclick="BackButton()" style="margin-left: -100px;"></i>
-
-            <div class="limiter">
-              <div class="container-login100"
-                style="background-image: url('images/bg-01.jpg'); background-size: 90% 82%; margin-top: -110px;width: 1000px; margin-left: -90px">
-
-                <form class="login100-form validate-form flex-sb flex-w" style="width: 500px; height: 600px;"
-                  id="update-form">
-                  <span class="login100-form-title p-b-53" style="margin-top: -50px;">
-                    EDIT
-                  </span>
-                  <div class="p-t-31 p-b-9" style="margin-top: -55px;">
-                    <span class="txt1">
-                      Select Collection:
-                    </span>
-                  </div>
-                  <div class="wrap-input100">
-                    <select id="updatecollection" name="updatecollection" onchange="populateFieldOptions()"
-                      class="input100">
-                      <option value="customer">Customer</option>
-                      <option value="inventory">Inventory</option>
-                      <option value="seller">Seller</option>
-                    </select>
-                    <span class="focus-input100"></span>
-                  </div>
-
-                  <div class="p-t-31 p-b-9" style="margin-top: -30px;">
-                    <span class="txt1">
-                      Field To Update:
-                    </span>
-                  </div>
-                  <div class="wrap-input100">
-                    <select id="field" name="field" class="input100">
-                      <!-- Options will be dynamically updated based on the selected collection -->
-                    </select>
-
-                    <span class="focus-input100"></span>
-                  </div>
-
-                  <div class="p-t-13 p-b-9">
-                    <span class="txt1">
-                      Update by:
-                    </span>
-                  </div>
-                  <div class="wrap-input100">
-                    <input class="input100" type="text" id="idname" name="idname" required>
-                    <span class="focus-input100"></span>
-                  </div>
-                  <div class="p-t-13 p-b-9">
-                    <span class="txt1">
-                      New Value:
-                    </span>
-                  </div>
-                  <div class="wrap-input100">
-                    <input class="input100" id="newvalue" name="newvalue" required>
-                    <span class="focus-input100"></span>
-                  </div>
-
-                  <div class="container-login100-form-btn m-t-17">
-                    <button class="login100-form-btn" type="submit">
-                      Edit
-                    </button>
-                  </div>
-
-                  <div class="w-full text-center p-t-55">
-
-
-
-                  </div>
-                </form>
-              </div>
-
-            </div>
-
-
-            <div id="dropDownSelect1"></div>
-
-          </div>
-
-          <div id="notapprovedseller" style="display: none;">
+          <!-- Admin Audit -->
+          <div id="auditsnip" style="display: none;margin-left: 9%;">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
               integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous">
             <div class="container mt-3 mb-4">
+
               <div class="col-lg-9 mt-4 mt-lg-0">
+
                 <div class="row">
+
                   <div class="col-md-12">
+
                     <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
+                      <div class="filter" style="background-color: #d6e6eab0;padding:  5%;border-radius: 5px;">
+                        <div class="date" style="display: flex;justify-content: space-between;padding-bottom: 2%;">
+                          <div class="fromdate">
+                            <label>From : </label>
+                            <input type="date" id="listadminaudit-fromdate">
+                          </div>
+                          <div class="todate">
+                            <label>To : </label>
+                            <input type="date" id="listadminaudit-todate">
+                          </div>
+                          <div style="display: flex;">
+                            <div class="order-by ">
+                              <label>Order By:</label>
+                              <select id="listadminaudit-orderby">
+                                <option value="servicename">Service</option>
+                                <option value="apiname">API</option>
+                                <option value="audittime">Audit time</option>
+                              </select>
+                            </div>
+                            <div class="order-value ">
+                              <select id="listadminaudit-ordervalue">
+                                <option value="1">Ascending</option>
+                                <option value="-1">Decending</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="search" style="display: flex;">
+                          <div class="searchby">
+                            <label>Search By:</label>
+                            <select id="listadminaudit-searchby">
+                              <option value="adminid">Admin ID</option>
+                              <option value="auditid">Audit ID</option>
+                              <optio value="servicename">Service Name</option>
+                                <option value="apiname">API Name</option>
+                            </select>
+                          </div>
+                          <div class="searchvalue" style="padding-left: 8%;">
+                            <input id="listadminaudit-searchvalue" type="text" placeholder="Search Value 🔍"
+                              style="width: 200%;height: 30px;border-radius: 5px;">
+                          </div>
+                        </div>
+                        <div class="booleanvalue" style="display: flex;justify-content: space-between;padding-top:2%">
+                          <div class="approved">
+                            <label>Status :</label>
+                            <select id="listadminaudit-status">
+                              <option value="ALL">ALL</option>
+                              <option value="SUCCESS">SUCCESS</option>
+                              <option value="FAILED">FAILED</option>
+                            </select>
+                          </div>
+
+
+                        </div>
+
+                        <div style="display: flex;justify-content: space-between;padding-top: 2%;padding-bottom: 2%;">
+                          <button style="width: 30%;border-radius: 5%;color: #000;"
+                            onclick="DefaultAdminAuditSet()">Reset</button>
+                          <button style="width: 30%;border-radius: 5%;color: #000;" onclick="DisplayAdminAudit()">Modify
+                            🔍</button>
+                        </div>
+                      </div>
                       <table class="table manage-candidates-top mb-0">
                         <thead>
                           <tr>
-                            <th>Name</th>
-                            <th class="text-center">Mobile No</th>
+                            <th>Audit</th>
+                            <th class="text-center">Message</th>
+                            <th class="text-center">Status</th>
                             <th class="action text-right">Action</th>
                           </tr>
                         </thead>
-                        <tbody class="notapprovedseller-list-body">
+                        <tbody class="adminaudit-list-body">
 
                         </tbody>
-                      </table>
 
+                      </table>
+                      <div style="display: flex;justify-content: right;padding-top:2%">
+                        <div style="padding-right: 2%;" id="noofitemsinadminaudit">2 of 2</div>
+                        <select id="listadminaudit-pagenation" onchange="DisplayAdminAudit()">
+                          <option>10</option>
+                          <option>30</option>
+                          <option>50</option>
+                          <option>70</option>
+                          <option>100</option>
+                        </select>
+
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <!--Register User-->
 
-          <div class="wrapper" style="display: none;">
-            <div class="inner">
-              <img src="images/seller-1.png" alt="" class="image-1" style="margin-left: -130px;">
-              <form action="" id="seller-form">
-                <h3>Create Seller</h3>
-                <div class="form-holder">
-                  <span class="lnr lnr-user"></span>
-                  <input type="text" class="form-control" id="seller-name" placeholder="Username"
-                    style="border-top: none;border-left: none;border-right: none; margin-left: 10px;outline: none;">
+          <!-- Developer Audit -->
+          <div id="devauditsnip" style="display: none;margin-left: 9%;">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
+              integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous">
+            <div class="container mt-3 mb-4">
+
+              <div class="col-lg-9 mt-4 mt-lg-0">
+
+                <div class="row">
+
+                  <div class="col-md-12">
+
+                    <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
+                      <div class="filter" style="background-color: #d6e6eab0;padding:  5%;border-radius: 5px;">
+                        <div class="date" style="display: flex;justify-content: space-between;padding-bottom: 2%;">
+                          <div class="fromdate">
+                            <label>From : </label>
+                            <input type="date" id="listdeveloperaudit-fromdate">
+                          </div>
+                          <div class="todate">
+                            <label>To : </label>
+                            <input type="date" id="listdeveloperaudit-todate">
+                          </div>
+                          <div style="display: flex;">
+                            <div class="order-by ">
+                              <label>Order By:</label>
+                              <select id="listdeveloperaudit-orderby">
+                                <option value="errortime">Audit time</option>
+                              </select>
+                            </div>
+                            <div class="order-value ">
+                              <select id="listdeveloperaudit-ordervalue">
+                                <option value="1">Ascending</option>
+                                <option value="-1">Decending</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="search" style="display: flex;">
+                          <div class="searchby">
+                            <label>Search By:</label>
+                            <select id="listdeveloperaudit-searchby">
+                              <option value="errorid">Audit ID</option>
+                            </select>
+                          </div>
+                          <div class="searchvalue" style="padding-left: 8%;">
+                            <input id="listdeveloperaudit-searchvalue" type="text" placeholder="Search Value 🔍"
+                              style="width: 200%;height: 30px;border-radius: 5px;">
+                          </div>
+                        </div>
+                        <div class="booleanvalue" style="display: flex;justify-content: space-between;padding-top:2%">
+                          <div class="approved">
+                            <label>Status :</label>
+                            <select id="listdeveloperaudit-status">
+                              <option value="ALL">ALL</option>
+                              <option value="SUCCESS">FIXED</option>
+                              <option value="FAILED">NOT FIXED</option>
+                            </select>
+                          </div>
+
+
+                        </div>
+
+                        <div style="display: flex;justify-content: space-between;padding-top: 2%;padding-bottom: 2%;">
+                          <button style="width: 30%;border-radius: 5%;color: #000;"
+                            onclick="DefaultDeveloperAuditSet()">Reset</button>
+                          <button style="width: 30%;border-radius: 5%;color: #000;" onclick="DisplayDeveloperAudit()">Modify
+                            🔍</button>
+                        </div>
+                      </div>
+                      <table class="table manage-candidates-top mb-0">
+                        <thead>
+                          <tr>
+                            <th>Audit</th>
+                            <th class="text-center">Message</th>
+                            <th class="text-center">Fixed</th>
+                            <th class="action text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody class="developeraudit-list-body">
+
+                        </tbody>
+
+                      </table>
+                      <div style="display: flex;justify-content: right;padding-top:2%">
+                        <div style="padding-right: 2%;" id="noofitemsindeveloperaudit">2 of 2</div>
+                        <select id="listdeveloperaudit-pagenation" onchange="DisplayDeveloperAudit()">
+                          <option>10</option>
+                          <option>30</option>
+                          <option>50</option>
+                          <option>70</option>
+                          <option>100</option>
+                        </select>
+
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-phone-handset"></span>
-                  <input type="text" class="form-control" id="seller-phone" placeholder="Phone Number"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-envelope"></span>
-                  <input type="text" class="form-control" id="seller-email" placeholder="Mail"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-lock"></span>
-                  <input type="password" class="form-control" id="seller-password" placeholder="Password"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-lock"></span>
-                  <input type="password" class="form-control" id="seller-confirm-password"
-                    placeholder="Confirm Password"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-home"></span>
-                  <input type="address" class="form-control" id="seller-address" placeholder="Address"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-user"></span>
-                  <input type="file" class="form-control" id="seller-image" placeholder="Address"
-                    style="border-top: none; border-left: none; border-right: none; margin-left: 10px; outline: none;">
-                </div>
-                <button type="submit">
-                  <span>Create</span>
-                </button>
-              </form>
-              <img src="images/seller-2.png" alt="" class="image-2">
+              </div>
             </div>
-
           </div>
 
-          <!--Employee User-->
 
-          <div class="wrapper" id="employee-wrapper" style="display: none;">
-            <div class="inner">
-              <img src="images/image-1.png" alt="" class="image-1">
-              <form action="" id="Employee-form">
-                <h3>Create Employee</h3>
-                <div class="form-holder">
-                  <span class="lnr lnr-user"></span>
-                  <input type="text" class="form-control" id="worker-name" placeholder="Employee Name"
-                    style="border-top: none;border-left: none;border-right: none; margin-left: 10px;outline: none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-phone-handset"></span>
-                  <input type="text" class="form-control" id="worker-phone" placeholder="Employee Phone Number"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-envelope"></span>
-                  <input type="text" class="form-control" id="worker-email" placeholder="Employee Mail"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-lock"></span>
-                  <input type="text" class="form-control" id="worker-role" placeholder="Employee Role"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-lock"></span>
-                  <input type="number" class="form-control" id="worker-salary" placeholder="Employee Salary"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <div class="form-holder">
-                  <span class="lnr lnr-user"></span>
-                  <input type="file" class="form-control" id="worker-image" placeholder="Address"
-                    style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;">
-                </div>
-                <button type="submit">
-                  <span>Create</span>
-                </button>
-              </form>
-              <img src="images/image-2.png" alt="" class="image-2">
-            </div>
-
-          </div>
 
           <!--Create Admin-->
           <div class="admin-wrapper" id="admin-wrapper" style="display: none;">
@@ -2817,25 +2797,30 @@
                       required>
                   </div>
                   <div class="form-holder">
-                    <span class="lnr lnr-lock"></span>
-                    <input type="password" class="form-control" id="admin-password" placeholder="Password"
+                    <span class="lnr lnr-user"></span>
+                    <input type="file" class="form-control" id="admin-ip" placeholder="IP"
                       style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;"
                       required>
                   </div>
                   <div class="form-holder">
-                    <span class="lnr lnr-lock"></span>
-                    <input type="password" class="form-control" id="admin-confirmpassword"
-                      placeholder="Confirm-Password"
-                      style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;"
-                      required>
+                    <span class="lnr lnr-cog"></span>
+                    <div class="form-check form-holder d-flex align-items-center"
+                      style="padding-top: 0px;margin-top: 0px;padding-bottom: 10px;">
+                      <label class="form-check-label mr-2" for="admin-canupdate"
+                        style="padding-right: 25px;">Update</label>
+                      <input class="form-check-input custom-checkbox" type="checkbox" id="admin-canupdate">
+
+                      <label class="form-check-label mr-2" for="admin-candelete"
+                        style="padding-right: 25px;">Delete</label>
+                      <input class="form-check-input custom-checkbox" type="checkbox" id="admin-candelete">
+
+                      <label class="form-check-label mr-2" for="admin-canalteradmin"
+                        style="padding-right: 25px;">Admin</label>
+                      <input class="form-check-input custom-checkbox" type="checkbox" id="admin-canalteradmin">
+
+                    </div>
                   </div>
-                  <div class="form-holder">
-                    <span class="lnr lnr-location"></span>
-                    <input type="text" class="form-control" id="admin-ip" placeholder="IP"
-                      style="border-top: none;border-left: none;border-right: none;margin-left: 10px;outline:none;"
-                      required>
-                  </div>
-                  <button type="submit">
+                  <button type="click" onclick="CreateAdmin(event)">
                     <span>Create</span>
                   </button>
                 </div>
@@ -2934,6 +2919,141 @@
               </form>
             </div>
           </div>
+        </div>
+        <!-- Display Edit Admin -->
+        <div class="displayeditadmin" id="displayeditadmin" style="display: none;">
+          <div class="container-xl px-4 mt-4">
+
+
+
+            <div class="row">
+              <div class="col-xl-4">
+
+                <div class="card mb-4 mb-xl-0">
+                  <div class="card-header">Profile Picture</div>
+                  <div class="card-body text-center">
+
+                    <img class="img-account-profile rounded-circle mb-2"
+                      src="http://bootdey.com/img/Content/avatar/avatar1.png" alt>
+
+                    <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+
+                    <button class="btn btn-primary" type="button">Upload new image</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-8">
+
+                <div class="card mb-4">
+                  <div class="card-header">Account Details</div>
+
+                  <form>
+                    <div class="row gx-3 mb-3" style="border-radius: 10px;">
+
+                      <div class="col-md-6"
+                        style="background-color: rgb(209, 217, 218);padding: 10px;text-align: left;">
+                        <label class="mb-1" style="padding-right: 10px;font-size: 20px;">Reset Password :</label>
+                        <i class="fas fa-sync-alt" style="font-size: 25px;cursor: pointer;"
+                          onclick="ResetPassword(event,document.getElementById('inputEmailAddress').value)"></i>
+                      </div>
+
+                      <div class="col-md-6"
+                        style="background-color: rgb(209, 217, 218);padding: 10px;text-align: right;">
+                        <label class="mb-1" style="padding-right: 10px;font-size: 20px">Reset Gauth :</label>
+                        <i class="fas fa-sync-alt" style="font-size: 25px;cursor: pointer;"
+                          onclick="ResetGauth(event,document.getElementById('inputEmailAddress').value)"></i>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="small mb-1" for="inputadminid">Admin ID</label>
+                      <input class="form-control" id="inputadminid" type="text" placeholder="Enter your username"
+                        value="username" disabled>
+                    </div>
+
+                    <div class="row gx-3 mb-3">
+
+                      <div class="col-md-6">
+                        <label class="small mb-1" for="inputUsername">Username</label>
+                        <input class="form-control" id="inputUsername" type="text" placeholder="Enter your first name"
+                          value="Valerie">
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="small mb-1" for="createdby">Created By</label>
+                        <input class="form-control" id="createdby" type="text" placeholder="Enter your last name"
+                          value="Luna" disabled>
+                      </div>
+                    </div>
+
+
+
+                    <div class="row gx-3 mb-3">
+
+                      <div class="col-md-6">
+                        <label class="small mb-1" for="inputEmailAddress">Email address</label>
+                        <input class="form-control" id="inputEmailAddress" type="email"
+                          placeholder="Enter your email address" value="name@example.com" disabled>
+                      </div>
+
+
+                      <div class="col-md-6">
+                        <label class="small mb-1" for="wronginput">No of Wrong Input (Today)</label>
+                        <input class="form-control" id="wronginput" type="number">
+                      </div>
+                    </div>
+
+                    <div class="row gx-3 mb-3">
+
+                      <div class="col-md-6">
+                        <label class="small mb-1" for="createdtime">Created Time</label>
+                        <input class="form-control" id="createdtime" type="text"
+                          placeholder="Enter your organization name" value="Start Bootstrap" disabled>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="small mb-1" for="logintime">Last Login Time</label>
+                        <input class="form-control" id="logintime" type="text" placeholder="Enter your location"
+                          value="San Francisco, CA" disabled>
+                      </div>
+                    </div>
+
+
+
+                    <div class="row gx-3 mb-3" style="padding-bottom: 40px;">
+
+                      <div class="col-md-4">
+                        <label class="small mb-1" for="canupdate">Can Update</label>
+                        <select class="form-control" id="canupdate">
+                          <option value="true">ALLOW</option>
+                          <option value="false">BLOCK</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label class="small mb-1" for="candelete">Can Delete</label>
+                        <select class="form-control" id="candelete">
+                          <option value="true">ALLOW</option>
+                          <option value="false">BLOCK</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label class="small mb-1" for="canalteradmin">Alter Admin</label>
+                        <select class="form-control" id="canalteradmin">
+                          <option value="true">ALLOW</option>
+                          <option value="false">BLOCK</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <button class="btn btn-primary" type="button">Save changes</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
 
@@ -3145,6 +3265,20 @@
   <script src="scripts/DeleteAdmin.js"></script>
   <script src="scripts/BlockORUnblockAdmin.js"></script>
   <script src="scripts/ApproveAdmin.js"></script>
+  <script src="scripts/CreateAdmin.js"></script>
+  <script src="scripts/DisplayEditAdmin.js"></script>
+  <script src="scripts/ResetGauth.js"></script>
+  <script src="scripts/ResetPassword.js"></script>
+  <script src="scripts/ListAdminAudit.js"></script>
+  <script src="scripts/ListDeveloperAudit.js"></script>
+  <script src="scripts/Access/showCanAlterAdmin.js"></script>
+  <script src="scripts/Access/showCanDelete.js"></script>
+  <script src="scripts/Access/showCanUpdate.js"></script>
+  <script src="scripts/Access/showSuperAdmin.js"></script>
+
+
+
+
 
 
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

@@ -1,4 +1,6 @@
 function ApproveAdmin(email){
+ 
+
     const data = localStorage.getItem("admindata")
     var adminObject = JSON.parse(data);
      const formData = {
